@@ -41,11 +41,10 @@ const generateDomain = async (credentials, hosts, sources: ICdnSource) => {
   const { host: domain } = hosts;
   const cdnClient = CdnService.createClient(credentials);
   const dnsClient = DnsService.createClient(credentials);
-  // TODO: 先校验下域名状态
-  let domainDetailMode = await CdnService.describeCdnDomainDetail(cdnClient, domain);
-  console.log(domain, domainDetailMode);
   const { topDomain, rrDomainName } = parseDomain(domain);
+  await DnsService.describeDomainInfo(dnsClient, topDomain);
 
+  let domainDetailMode = await CdnService.describeCdnDomainDetail(cdnClient, domain);
   // 没有域名则添加域名
   if (!domainDetailMode) {
     // 第一次添加会出强制校验
@@ -83,8 +82,6 @@ const generateDomain = async (credentials, hosts, sources: ICdnSource) => {
       CdnService.modifyCdnDomain(cdnClient, { domain, sources });
     }
 
-    await DnsService.describeDomainInfo(dnsClient, topDomain);
-
     await DnsService.addDomainRecord(dnsClient, {
       domainName: topDomain,
       RR: rrDomainName,
@@ -104,7 +101,6 @@ export default async (orinalInputs) => {
   };
   const { hosts } = props;
   if (hosts) {
-    console.log(hosts);
     await Promise.all(
       hosts.map(async (host) => {
         await generateDomain(credentials, host, sources);

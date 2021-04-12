@@ -1,9 +1,21 @@
-import Client from '../../src/dnsclient.service';
+import DnsService from '../../src/services/dnsclient.service';
 import credentials from '../credentials';
 
-Client.addDomainRecord(credentials, {
-  domainName: 'serverlessfans.com',
-  RR: 'dankun',
-  type: 'CNAME',
-  value: 'dankun.serverlessfans.com.w.alikunlun.com',
-});
+const dnsClient = DnsService.createClient(credentials);
+
+DnsService.describeDomainInfo(dnsClient, 'hx3.dankunalijam.top');
+
+// DnsService.addDomainRecord(dnsClient, {
+//   domainName: 'raoxiaojing.top',
+//   RR: 'dankun',
+//   type: 'CNAME',
+//   value: 'dankun.serverlessfans.com.w.alikunlun.com',
+// });
+
+// import { load } from '@serverless-devs/core';
+
+// const abc = async () => {
+//   const pulumiComponentIns = await load('pulumi-alibaba');
+//   console.log(pulumiComponentIns);
+// };
+// abc();

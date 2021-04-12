@@ -56,7 +56,6 @@ export default class Client {
     });
     // 复制代码运行请自行打印 API 的返回值
     const result = await client.setCdnDomainStagingConfig(setCdnDomainStagingConfigRequest);
-    console.log(result);
   }
 
   /**
@@ -78,7 +77,6 @@ export default class Client {
     const result = await client.publishStagingConfigToProduction(
       publishStagingConfigToProductionRequest,
     );
-    console.log(result);
   }
 
   /**

@@ -3,8 +3,12 @@ import get from 'lodash.get';
 import domain from './services/domain.service';
 import oss, { IOssConfig } from './services/oss.services';
 
-export default class JamStackComponent {
+export default class WebsiteComponent {
   @HLogger('WEBSITE') logger: ILogger;
+  /**
+   * 部署
+   * @param inputs
+   */
   async deploy(inputs: any) {
     const { projectName, access } = inputs.project;
     this.logger.debug(`[${projectName}] inputs params: ${JSON.stringify(inputs, null, 2)}`);
@@ -19,14 +23,9 @@ export default class JamStackComponent {
       cors: get(inputs, 'props.cors'),
       referer: get(inputs, 'props.referer', { allowEmpty: true, referers: [] }),
     };
-    try {
-      await oss(ossConfig);
-      spinner('OSS静态资源部署成功').succeed();
-      await domain(inputs);
-    } catch (error) {
-      this.logger.log(`ERROR: ${error.message}`, 'red');
-      this.logger.error(error.stack);
-    }
+    await oss(ossConfig);
+    spinner('OSS静态资源部署成功').succeed();
+    await domain(inputs);
   }
 
   async remove(inputs: any) {
