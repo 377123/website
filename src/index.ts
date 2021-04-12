@@ -1,7 +1,7 @@
 import { HLogger, ILogger, getCredential, spinner } from '@serverless-devs/core';
 import get from 'lodash.get';
 import domain from './services/domain.service';
-import oss, { IOssConfig } from './deploy.server';
+import oss, { IOssConfig } from './services/oss.services';
 
 export default class JamStackComponent {
   @HLogger('WEBSITE') logger: ILogger;

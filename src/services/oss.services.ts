@@ -2,7 +2,7 @@ import OssClient from 'ali-oss';
 import { spinner } from '@serverless-devs/core';
 import path from 'path';
 import fs from 'fs-extra';
-import { PUT_BUCKET_CORS } from './contants';
+import { PUT_BUCKET_CORS } from '../contants';
 import walkSync from 'walk-sync';
 
 interface IPages {
