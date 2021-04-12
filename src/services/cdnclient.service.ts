@@ -55,7 +55,7 @@ export default class Client {
       ]),
     });
     // 复制代码运行请自行打印 API 的返回值
-    const result = await client.setCdnDomainStagingConfig(setCdnDomainStagingConfigRequest);
+    await client.setCdnDomainStagingConfig(setCdnDomainStagingConfigRequest);
   }
 
   /**
@@ -196,6 +196,43 @@ export default class Client {
       const messageCode = message.split(':')[0];
       throw new Error(CDN_ERRORS[messageCode] || message);
     }
+  }
+
+  /**
+   * @description 增加HTTP证书
+   * @param client
+   * @param param1
+   */
+  static async setDomainServerCertificate(
+    client,
+    { domain, certType = 'free' }: { domain: string; certType?: string },
+  ): Promise<void> {
+    const domainServerCertificateRequest = new $Cdn20180510.SetDomainServerCertificateRequest({
+      domainName: domain,
+      certType,
+      serverCertificateStatus: 'on',
+    });
+    await client.setDomainServerCertificate(domainServerCertificateRequest);
+    await Client.setCdnDomainForceHttps(client, { domain });
+  }
+
+  /**
+   * @description 强制HTTPS跳转
+   * @param client
+   * @param param1
+   */
+  static async setCdnDomainForceHttps(client, { domain }: { domain: string }): Promise<void> {
+    const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
+      domainNames: domain,
+      functions: JSON.stringify([
+        {
+          functionArgs: [{ argName: 'enable', argValue: 'on' }],
+          functionName: 'https_force',
+        },
+      ]),
+    });
+    const cdnResult = await client.batchSetCdnDomainConfig(cdnDomainStagingConfigRequest);
+    return cdnResult;
   }
 
   /**

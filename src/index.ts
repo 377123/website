@@ -25,6 +25,7 @@ export default class WebsiteComponent {
     };
     await oss(ossConfig);
     spinner('OSS静态资源部署成功').succeed();
+    // 挂载域名
     await domain(inputs);
   }
 

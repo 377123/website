@@ -3,22 +3,15 @@ services:
   website:
     component: /Users/yk/heimanba/aliFE/devsapp/website/lib/index.js # 指向项目路径
     access: private
-    # actions:
-    #   pre-deploy:
-    #     - run: npm run build
-    #       path: ./
     props:
       bucket: jamstack-hangzhou
       pages:
         index: index.html
         error: error.html
+
       region: cn-hangzhou
       hosts:
-        - host: dankun.serverless.com
-          referer:
-            switch: on
-            allowEmpty: true
-            referers: ['100.67.79.188', '140.205.215.168']
+        - host: hx5.alijam.top
 
       # cors:
       #   allowedOrigin: '*'

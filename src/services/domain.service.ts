@@ -22,7 +22,7 @@ const getCdnOssSources = (region: string, bucket: string): ICdnSource => {
 };
 
 // 生成系统域名
-const generateSystemDomain = async (credentials, inputs, sources: ICdnSource) => {
+const generateSystemDomain = async (credentials, inputs, sources: ICdnSource): Promise<any> => {
   const { props } = inputs;
   const domainConponent = await loadComponent('domain');
   const cdnClient = CdnService.createClient(credentials);
@@ -34,6 +34,7 @@ const generateSystemDomain = async (credentials, inputs, sources: ICdnSource) =>
   if (domainDetailMode.domainStatus === 'online') {
     CdnService.modifyCdnDomain(cdnClient, { domain: sysDomain, sources });
   }
+  await CdnService.setDomainServerCertificate(cdnClient, { domain: sysDomain });
 };
 
 // 绑定到自定义域名
@@ -42,9 +43,11 @@ const generateDomain = async (credentials, hosts, sources: ICdnSource) => {
   const cdnClient = CdnService.createClient(credentials);
   const dnsClient = DnsService.createClient(credentials);
   const { topDomain, rrDomainName } = parseDomain(domain);
+  // 验证主域存在
   await DnsService.describeDomainInfo(dnsClient, topDomain);
 
   let domainDetailMode = await CdnService.describeCdnDomainDetail(cdnClient, domain);
+  console.log(domainDetailMode);
   // 没有域名则添加域名
   if (!domainDetailMode) {
     // 第一次添加会出强制校验
@@ -54,7 +57,6 @@ const generateDomain = async (credentials, hosts, sources: ICdnSource) => {
       domain,
       sources,
     });
-
     await chillout.waitUntil(async () => {
       let isStop = false;
       while (!isStop) {
@@ -77,17 +79,22 @@ const generateDomain = async (credentials, hosts, sources: ICdnSource) => {
     // 配置CNAME后大约有10分钟延迟才会更新该列状态。如已按教程配置，请忽略该提示。如何配置？
   } else {
     // 运行中才能进行状态修改
+    // eslint-disable-next-line no-lonely-if
     if (domainDetailMode.domainStatus === 'online') {
       // 暂时先覆盖操作
       CdnService.modifyCdnDomain(cdnClient, { domain, sources });
+    } else {
+      await DnsService.addDomainRecord(dnsClient, {
+        domainName: topDomain,
+        RR: rrDomainName,
+        type: 'CNAME',
+        value: domainDetailMode.cname,
+      });
+      CdnService.modifyCdnDomain(cdnClient, { domain, sources });
     }
-
-    await DnsService.addDomainRecord(dnsClient, {
-      domainName: topDomain,
-      RR: rrDomainName,
-      type: 'CNAME',
-      value: domainDetailMode.cname,
-    });
+  }
+  if (domainDetailMode.serverCertificateStatus !== 'on') {
+    await CdnService.setDomainServerCertificate(cdnClient, { domain });
   }
 };
 
