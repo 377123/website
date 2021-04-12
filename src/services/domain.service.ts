@@ -23,11 +23,11 @@ const getCdnOssSources = (region: string, bucket: string): ICdnSource => {
 
 // 生成系统域名
 const generateSystemDomain = async (credentials, inputs, sources: ICdnSource) => {
-  const { Properties: props } = inputs;
+  const { props } = inputs;
   const domainConponent = await loadComponent('domain');
   const cdnClient = CdnService.createClient(credentials);
   // eslint-disable-next-line
-  inputs.Properties = { ...props, type: 'oss' };
+  inputs.props = { ...props, type: 'oss' };
 
   const sysDomain = await domainConponent.get(inputs);
   const domainDetailMode = await CdnService.describeCdnDomainDetail(cdnClient, sysDomain);
@@ -37,8 +37,8 @@ const generateSystemDomain = async (credentials, inputs, sources: ICdnSource) =>
 };
 
 // 绑定到自定义域名
-const generateDomain = async (credentials, inputs, sources: ICdnSource) => {
-  const { domain } = get(inputs, 'Properties', {});
+const generateDomain = async (credentials, hosts, sources: ICdnSource) => {
+  const { host: domain } = hosts;
   const cdnClient = CdnService.createClient(credentials);
   const dnsClient = DnsService.createClient(credentials);
   // TODO: 先校验下域名状态
@@ -96,15 +96,20 @@ const generateDomain = async (credentials, inputs, sources: ICdnSource) => {
 
 export default async (orinalInputs) => {
   const inputs = cloneDeep(orinalInputs);
-  const { Properties: props } = inputs;
+  const { props } = inputs;
   const sources = getCdnOssSources(get(props, 'region'), get(props, 'bucket'));
   const credentials = {
     accessKeyId: get(inputs, 'Credentials.AccessKeyID'),
     accessKeySecret: get(inputs, 'Credentials.AccessKeySecret'),
   };
-
-  if (props.domain) {
-    await generateDomain(credentials, inputs, sources);
+  const { hosts } = props;
+  if (hosts) {
+    console.log(hosts);
+    await Promise.all(
+      hosts.map(async (host) => {
+        await generateDomain(credentials, host, sources);
+      }),
+    );
   } else {
     await generateSystemDomain(credentials, inputs, sources);
   }

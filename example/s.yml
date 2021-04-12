@@ -1,22 +1,30 @@
-Website_Component:
-  Component: /Users/yk/heimanba/aliFE/jmstack-proj/jamstack-static-compoment/lib/index.js # 指向项目路径
-  Access: private
-  Extends:
-    deploy:
-      - Hook: npm run build
-        Path: ./
-        Pre: true
-  Properties:
-    bucket: jamstack-hangzhou
-    staticPath: ./build
-    region: cn-hangzhou
-    domain: hx2.alijam.top
-    pages:
-      index: index.html
-      error: error.html
-    # cors:
-    #   allowedOrigin: '*'
-    #   allowedMethod: ['GET']
-    # referer:
-    #   allowEmpty: true
-    #   referers: ['100.67.79.188', '140.205.215.168']
+edition: 1.0.0
+services:
+  website:
+    component: /Users/yk/heimanba/aliFE/devsapp/website/lib/index.js # 指向项目路径
+    access: private
+    actions:
+      pre-deploy:
+        - run: npm run build
+          path: ./
+    props:
+      bucket: jamstack-hangzhou
+      staticPath: ./build
+      pages:
+        index: index.html
+        error: error.html
+
+      region: cn-hangzhou
+      hosts:
+        - host: hx2.alijam.top
+          referer:
+            switch: on
+            allowEmpty: true
+            referers: ['100.67.79.188', '140.205.215.168']
+
+      # cors:
+      #   allowedOrigin: '*'
+      #   allowedMethod: ['GET']
+      # referer:
+      #   allowEmpty: true
+      #   referers: ['100.67.79.188', '140.205.215.168']
