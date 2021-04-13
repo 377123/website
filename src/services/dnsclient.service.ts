@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/indent */
 import Alidns20150109, * as $Alidns20150109 from '@alicloud/alidns20150109';
 import * as $OpenApi from '@alicloud/openapi-client';
+import { Logger } from '@serverless-devs/core';
 import { ICredentials } from '../interface';
 
 export interface IAddDomainRecord {
@@ -43,9 +44,13 @@ export default class Client {
     const addDomainRecordRequest = new $Alidns20150109.AddDomainRecordRequest(
       addDomainRecordParams,
     );
-    // 复制代码运行请自行打印 API 的返回值
-    const result = await client.addDomainRecord(addDomainRecordRequest);
-    return result;
+    try {
+      const result = await client.addDomainRecord(addDomainRecordRequest);
+      Logger.log('配置CNAME后大约有10分钟延迟才会更新该列状态。', 'blue');
+      return result;
+    } catch (error) {
+      Logger.warn('WEBSITE', `使用阿里DNS解析失败, 请手动配置CNAME${addDomainRecordParams.value}`);
+    }
   }
 
   static async describeDomainInfo(client, domain: string): Promise<any> {

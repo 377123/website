@@ -43,11 +43,8 @@ const generateDomain = async (credentials, hosts, sources: ICdnSource) => {
   const cdnClient = CdnService.createClient(credentials);
   const dnsClient = DnsService.createClient(credentials);
   const { topDomain, rrDomainName } = parseDomain(domain);
-  // 验证主域存在
-  await DnsService.describeDomainInfo(dnsClient, topDomain);
 
   let domainDetailMode = await CdnService.describeCdnDomainDetail(cdnClient, domain);
-  console.log(domainDetailMode);
   // 没有域名则添加域名
   if (!domainDetailMode) {
     // 第一次添加会出强制校验
@@ -69,14 +66,12 @@ const generateDomain = async (credentials, hosts, sources: ICdnSource) => {
       }
     });
 
-    // TODO: 是否直接DNS解析还是提示出来？
     await DnsService.addDomainRecord(dnsClient, {
       domainName: topDomain,
       RR: rrDomainName,
       type: 'CNAME',
       value: domainDetailMode.cname,
     });
-    // 配置CNAME后大约有10分钟延迟才会更新该列状态。如已按教程配置，请忽略该提示。如何配置？
   } else {
     // 运行中才能进行状态修改
     // eslint-disable-next-line no-lonely-if
