@@ -74,9 +74,7 @@ export default class Client {
       },
     );
     // 复制代码运行请自行打印 API 的返回值
-    const result = await client.publishStagingConfigToProduction(
-      publishStagingConfigToProductionRequest,
-    );
+    await client.publishStagingConfigToProduction(publishStagingConfigToProductionRequest);
   }
 
   /**
@@ -93,6 +91,13 @@ export default class Client {
       const domainDetailMode = get(result, 'body.getDomainDetailModel');
       return domainDetailMode;
     } catch (error) {
+      const message = get(error, 'message', '');
+      const messageCode = message.split(':')[0];
+      if (messageCode === 'CdnServiceNotFound') {
+        throw new Error(
+          '您的帐户尚未开通CDN服务，请前往 https://common-buy.aliyun.com/?commodityCode=cdn#/open 页面进行开通',
+        );
+      }
       return null;
     }
   }

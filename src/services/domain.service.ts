@@ -45,11 +45,11 @@ const generateDomain = async (credentials, hosts, sources: ICdnSource) => {
   const { topDomain, rrDomainName } = parseDomain(domain);
 
   let domainDetailMode = await CdnService.describeCdnDomainDetail(cdnClient, domain);
+
   // 没有域名则添加域名
   if (!domainDetailMode) {
     // 第一次添加会出强制校验
     await CdnService.verifyDomainOwner(cdnClient, { domain });
-    await CdnService.deleteCdnDomain(cdnClient, domain, true);
     await CdnService.addCDNDomain(cdnClient, {
       domain,
       sources,
@@ -73,20 +73,7 @@ const generateDomain = async (credentials, hosts, sources: ICdnSource) => {
       value: domainDetailMode.cname,
     });
   } else {
-    // 运行中才能进行状态修改
-    // eslint-disable-next-line no-lonely-if
-    if (domainDetailMode.domainStatus === 'online') {
-      // 暂时先覆盖操作
-      CdnService.modifyCdnDomain(cdnClient, { domain, sources });
-    } else {
-      await DnsService.addDomainRecord(dnsClient, {
-        domainName: topDomain,
-        RR: rrDomainName,
-        type: 'CNAME',
-        value: domainDetailMode.cname,
-      });
-      CdnService.modifyCdnDomain(cdnClient, { domain, sources });
-    }
+    CdnService.modifyCdnDomain(cdnClient, { domain, sources });
   }
   if (domainDetailMode.serverCertificateStatus !== 'on') {
     await CdnService.setDomainServerCertificate(cdnClient, { domain });

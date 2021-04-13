@@ -2,9 +2,9 @@ edition: 1.0.0
 services:
   website:
     component: /Users/shihuali/workspace/website/lib/index.js # 指向项目路径
-    access: private
+    access: my
     props:
-      bucket: shl-test05
+      bucket: shl-website-test01
       src:
         src: './src'
         dist: './build'
@@ -13,7 +13,7 @@ services:
         error: index.html
       region: cn-hangzhou
       hosts:
-        - host: shl01.alijam.top
+        - host: shl2.shihuali.top
 
       # cors:
       #   allowedOrigin: '*'
