@@ -4,10 +4,14 @@ import path from 'path';
 import fs from 'fs-extra';
 import { PUT_BUCKET_CORS } from '../contants';
 import walkSync from 'walk-sync';
+import { spawnSync } from 'child_process';
 
-interface IPages {
+interface ISrc {
+  src: string;
+  dist: string;
+  hook: string;
   index: string;
-  error?: string;
+  error: string;
 }
 
 interface ICors {
@@ -15,33 +19,20 @@ interface ICors {
   allowedMethod: string[];
 }
 
-interface IReferer {
-  allowEmpty: boolean;
-  referers: string[];
-}
 export interface IOssConfig {
   accessKeyId: string;
   accessKeySecret: string;
   bucket: string;
   region: string;
-  staticPath: string;
-  pages: IPages;
+  src: ISrc;
   cors: ICors;
-  referer: IReferer;
 }
 
 export default async (ossConfig: IOssConfig) => {
-  // 开启OSS上传
-  const {
-    bucket,
-    region,
-    accessKeyId,
-    accessKeySecret,
-    staticPath,
-    pages,
-    cors,
-    referer,
-  } = ossConfig;
+  const { bucket, region, accessKeyId, accessKeySecret, src, cors } = ossConfig;
+  if (src.hook) {
+    await buildSpawnSync(src.hook, src.src);
+  }
   // 构造oss客户端
   let ossClient = new OssClient({
     bucket,
@@ -61,19 +52,27 @@ export default async (ossConfig: IOssConfig) => {
     accessKeySecret,
   });
   // 文件上传
-  await put(ossClient, staticPath);
+  await put(ossClient, src.dist);
 
   // 配置静态托管
-  await ossClient.putBucketWebsite(bucket, pages);
+  await ossClient.putBucketWebsite(bucket, { index: src.index, error: src.error });
 
   // 设置跨域资源共享规则
   if (cors) {
     await ossClient.putBucketCORS(bucket, [cors]);
   }
-
-  // HTTP Referer 白名单配置，用于防止他人盗用 OSS 数据
-  await ossClient.putBucketReferer(bucket, referer.allowEmpty, referer.referers);
 };
+
+async function buildSpawnSync(hook: string, src: string) {
+  const result = spawnSync(hook, [], {
+    cwd: path.resolve(process.cwd(), src),
+    stdio: 'inherit',
+    shell: true,
+  });
+  if (result && result.status !== 0) {
+    throw Error('> Execute Error');
+  }
+}
 
 async function put(ossClient: OssClient, staticPath: string) {
   const paths = walkSync(staticPath);
@@ -88,7 +87,6 @@ async function put(ossClient: OssClient, staticPath: string) {
       } catch (error) {
         spin.fail();
         throw new Error(error.message);
-        // console.error(error);
       }
     }
   }

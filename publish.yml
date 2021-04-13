@@ -14,13 +14,6 @@ Properties:
     type:
       - String
 
-  staticPath:
-    description: 前端打包构建后的产物
-    required: false
-    default: build
-    type:
-      - String[简单配置]
-
   region:
     description: 地域
     required: false
@@ -53,21 +46,39 @@ Properties:
     type:
       - String
 
-  pages:
-    description: 配置静态托管 # https://help.aliyun.com/document_detail/31962.html?spm=5176.10695662.1996646101.searchclickresult.2259558fTo7RTp#title-f9y-pq6-ksb
-    required: false
+  src:
+    description: 执行目录
+    required: true
     type:
       - Struct:
+          src:
+            required: true
+            description: 你构建的项目代码目录。
+            default: './'
+            type:
+              - String
+          dist:
+            required: false
+            description: 钩子脚本执行构建后，输出的目录。如果配置 hook， 此参数必填
+            default: './build'
+            type:
+              - String
+          hook:
+            required: false
+            description: 钩子脚本。在你项目代码上传之前执行。
+            default: npm run build
+            type:
+              - String
           index:
             required: false
             description: 默认首页
-            default: 'index.html'
+            default: index.html
             type:
               - String
           error:
             required: false
             description: 默认 404 页
-            default: 'error.html'
+            default: error.html
             type:
               - String
   cors:
@@ -90,19 +101,3 @@ Properties:
                 - DELETE
                 - POST
                 - HEAD
-  referer:
-    description: HTTP Referer 白名单配置，用于防止他人盗用 OSS 数据
-    required: false
-    type:
-      - Struct:
-          allowEmpty:
-            description: 是否允许 空Referer
-            required: false
-            default: true
-            type:
-              - Boolean
-          referers:
-            description: Referer为域名和IP地址
-            required: false
-            type:
-              - List<String>

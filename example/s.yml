@@ -1,17 +1,19 @@
 edition: 1.0.0
 services:
   website:
-    component: /Users/yk/heimanba/aliFE/devsapp/website/lib/index.js # 指向项目路径
+    component: /Users/shihuali/workspace/website/lib/index.js # 指向项目路径
     access: private
     props:
-      bucket: jamstack-hangzhou
-      pages:
+      bucket: shl-test05
+      src:
+        src: './src'
+        dist: './build'
+        hook: npm run build
         index: index.html
-        error: error.html
-
+        error: index.html
       region: cn-hangzhou
       hosts:
-        - host: hx5.alijam.top
+        - host: shl01.alijam.top
 
       # cors:
       #   allowedOrigin: '*'

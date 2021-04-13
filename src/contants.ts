@@ -6,6 +6,14 @@ export const PUT_BUCKET_CORS = [
   },
 ];
 
+export const DEFAULT_SRC = {
+  src: './',
+  dist: './build',
+  hook: 'npm run build',
+  index: 'index.html',
+  error: 'error.html',
+};
+
 export const CDN_ERRORS = {
   'InvalidDomainName.Malformed': '域名格式错误或批量新增不支持泛域名。',
   MissingParameter: '参数cdnType和sourceType为必填。',
