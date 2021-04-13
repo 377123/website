@@ -14,6 +14,15 @@ services:
       region: cn-hangzhou
       hosts:
         - host: shl2.shihuali.top
+          access:
+            referer:
+              refererType: blacklist # whitelist：白名单 blacklist：黑名单
+              allowEmpty: true #true 代表允许空 Referer字段访问CDN资源，反之为false
+              referers: 
+                - 'aliyun.com'
+                - 'taobao.com'
+
+
 
       # cors:
       #   allowedOrigin: '*'

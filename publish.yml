@@ -39,13 +39,6 @@ Properties:
           - us-west-1
           - us-east-1
           - ap-south-1
-
-  domain:
-    description: 域名配置
-    required: false
-    type:
-      - String
-
   src:
     description: 执行目录
     required: true
@@ -81,8 +74,45 @@ Properties:
             default: error.html
             type:
               - String
+  hosts:
+    description: CDN 加速域名配置
+    required: false
+    type:
+      - LIST:
+          host:
+            description: 需要接入的 CDN 域名
+            required: true
+            type:
+              - String
+          access:
+            description: 访问控制
+            required: false
+            type:
+              - Struct:
+                  referer:
+                    description: Referer防盗链
+                    required: false
+                    type:
+                      - Struct:
+                          refererType:
+                            description: Referer类型
+                            required: true
+                            type:
+                              - Enum:
+                                  - blacklist
+                                  - whitelist
+                          allowEmpty:
+                            description: 允许空 Referer字段访问CDN资源
+                            required: false
+                            type:
+                              - Boolean
+                          referers:
+                            description: 规则，支持通配符，如a.*b.com可以匹配到a.aliyun.b.com或a.img.b.com等
+                            required: true
+                            type:
+                              - List<String>
   cors:
-    description: 设置跨域资源共享规则  # https://help.aliyun.com/document_detail/142900.htm?spm=a2c4g.11186623.2.18.10db66ffviAcIU#section-jfv-uw1-ua4
+    description: 设置跨域资源共享规则
     required: false
     type:
       - Struct:
@@ -95,9 +125,9 @@ Properties:
             description: 允许访问的域名
             required: true
             type:
-              - List<String>:
-                - GET
-                - PUT
-                - DELETE
-                - POST
-                - HEAD
+              - List:
+                  - GET
+                  - PUT
+                  - DELETE
+                  - POST
+                  - HEAD

@@ -30,22 +30,24 @@ const generateSystemDomain = async (credentials, inputs, sources: ICdnSource): P
   inputs.props = { ...props, type: 'oss' };
 
   const sysDomain = await domainConponent.get(inputs);
-  const domainDetailMode = await CdnService.describeCdnDomainDetail(cdnClient, sysDomain);
-  if (domainDetailMode.domainStatus === 'online') {
-    CdnService.modifyCdnDomain(cdnClient, { domain: sysDomain, sources });
-  }
+  CdnService.modifyCdnDomain(cdnClient, { domain: sysDomain, sources });
+
   await CdnService.setDomainServerCertificate(cdnClient, { domain: sysDomain });
+
+  const referer = get(props, 'access.referer');
+  if (referer) {
+    await CdnService.setCdnDomainReferer(cdnClient, { domain: sysDomain, referer });
+  }
 };
 
 // 绑定到自定义域名
 const generateDomain = async (credentials, hosts, sources: ICdnSource) => {
-  const { host: domain } = hosts;
+  const { host: domain, access } = hosts;
   const cdnClient = CdnService.createClient(credentials);
   const dnsClient = DnsService.createClient(credentials);
   const { topDomain, rrDomainName } = parseDomain(domain);
 
   let domainDetailMode = await CdnService.describeCdnDomainDetail(cdnClient, domain);
-
   // 没有域名则添加域名
   if (!domainDetailMode) {
     // 第一次添加会出强制校验
@@ -75,8 +77,13 @@ const generateDomain = async (credentials, hosts, sources: ICdnSource) => {
   } else {
     CdnService.modifyCdnDomain(cdnClient, { domain, sources });
   }
+
   if (domainDetailMode.serverCertificateStatus !== 'on') {
     await CdnService.setDomainServerCertificate(cdnClient, { domain });
+  }
+
+  if (get(access, 'referer')) {
+    await CdnService.setCdnDomainReferer(cdnClient, { domain, referer: get(access, 'referer') });
   }
 };
 
@@ -91,8 +98,8 @@ export default async (orinalInputs) => {
   const { hosts } = props;
   if (hosts) {
     await Promise.all(
-      hosts.map(async (host) => {
-        await generateDomain(credentials, host, sources);
+      hosts.map(async (item) => {
+        await generateDomain(credentials, item, sources);
       }),
     );
   } else {

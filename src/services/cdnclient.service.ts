@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import Cdn20180510, * as $Cdn20180510 from '@alicloud/cdn20180510';
 import * as $OpenApi from '@alicloud/openapi-client';
-import { ICredentials, ICdnSource } from '../interface';
-import { parseDomain } from '../utils';
+import { ICredentials, ICdnSource, IReferer } from '../interface';
+import { parseReferer } from '../utils';
 import { CDN_ERRORS } from '../contants';
 import get from 'lodash.get';
 
@@ -82,9 +82,8 @@ export default class Client {
    * @param credentials
    */
   static async describeCdnDomainDetail(client, domain: string): Promise<any> {
-    const { topDomain, rrDomainName } = parseDomain(domain);
     const describeCdnDomainDetailRequest = new $Cdn20180510.DescribeCdnDomainDetailRequest({
-      domainName: `${rrDomainName}.${topDomain}`,
+      domainName: domain,
     });
     try {
       const result = await client.describeCdnDomainDetail(describeCdnDomainDetailRequest);
@@ -161,11 +160,10 @@ export default class Client {
     client,
     { domain, sources }: { domain: string; sources: ICdnSource },
   ): Promise<void> {
-    const { topDomain, rrDomainName } = parseDomain(domain);
     // 添加CDN
     const addCdnDomainRequest = new $Cdn20180510.AddCdnDomainRequest({
       cdnType: 'web', // 图片小文件
-      domainName: `${rrDomainName}.${topDomain}`,
+      domainName: domain,
       sources: JSON.stringify([].concat(sources)),
     });
     try {
@@ -187,10 +185,9 @@ export default class Client {
     client,
     { domain, sources }: { domain: string; sources?: ICdnSource },
   ): Promise<void> {
-    const { topDomain, rrDomainName } = parseDomain(domain);
     // 修改源
     const addCdnDomainRequest = new $Cdn20180510.ModifyCdnDomainRequest({
-      domainName: `${rrDomainName}.${topDomain}`,
+      domainName: domain,
       sources: JSON.stringify([].concat(sources)),
     });
     try {
@@ -241,6 +238,23 @@ export default class Client {
   }
 
   /**
+   * @description Referer防盗链
+   * @param client
+   * @param param1
+   */
+  static async setCdnDomainReferer(
+    client,
+    { domain, referer }: { domain: string; referer: IReferer },
+  ): Promise<any> {
+    const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
+      domainNames: domain,
+      functions: JSON.stringify([parseReferer(referer)]),
+    });
+    const cdnResult = await client.batchSetCdnDomainConfig(cdnDomainStagingConfigRequest);
+    return cdnResult;
+  }
+
+  /**
    * 添加加速域名
    * @param accessKeyId
    * @param accessKeySecret
@@ -249,12 +263,11 @@ export default class Client {
   //   client,
   //   { domain, cdnSource, esRule }: { domain: string; cdnSource: ICdnSource; esRule?: string },
   // ): Promise<void> {
-  //   const { topDomain, rrDomainName } = parseDomain(domain);
 
   //   // 添加CDN
   //   const addCdnDomainRequest = new $Cdn20180510.AddCdnDomainRequest({
   //     cdnType: 'web', // 图片小文件
-  //     domainName: `${rrDomainName}.${topDomain}`,
+  //     domainName: domain,
   //     sources: JSON.stringify([].concat(cdnSource)),
   //   });
   //   // 复制代码运行请自行打印 API 的返回值

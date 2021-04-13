@@ -13,3 +13,9 @@ export interface ICdnSource {
   type: 'oss' | 'ipaddr' | 'domain' | 'fc_domain';
   port: number;
 }
+
+export interface IReferer {
+  refererType: 'blacklist' | 'whitelist';
+  allowEmpty: boolean;
+  referers: string[];
+}
