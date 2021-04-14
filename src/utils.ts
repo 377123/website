@@ -70,6 +70,10 @@ export function parseCertInfo(params: ICertInfo) {
       serverCertificate: params.serverCertificate,
     };
   }
+  return {
+    certType: 'free',
+    serverCertificateStatus: 'on',
+  };
 }
 
 export enum ForceHttpsEnum {

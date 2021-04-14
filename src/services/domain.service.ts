@@ -21,6 +21,19 @@ const getCdnOssSources = (region: string, bucket: string): ICdnSource => {
   };
 };
 
+const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
+  const { access, https } = hostObj;
+  // https 配置
+  if (https) {
+    await CdnService.setDomainServerCertificate(cdnClient, { domain, https });
+  }
+  // referer 防盗链
+  const referer = get(access, 'referer');
+  if (referer) {
+    await CdnService.setCdnDomainReferer(cdnClient, { domain, referer });
+  }
+};
+
 // 生成系统域名
 const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
   const { credentials, inputs, sources } = params;
@@ -31,20 +44,16 @@ const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
   inputs.props = { ...props, type: 'oss' };
 
   const sysDomain = await domainConponent.get(inputs);
+
   CdnService.modifyCdnDomain(cdnClient, { domain: sysDomain, sources });
 
   await CdnService.setDomainServerCertificate(cdnClient, { domain: sysDomain });
-
-  const referer = get(props, 'access.referer');
-  if (referer) {
-    await CdnService.setCdnDomainReferer(cdnClient, { domain: sysDomain, referer });
-  }
 };
 
 // 绑定到自定义域名
 const generateDomain = async (params: IDomainParams) => {
-  const { credentials, item, sources } = params;
-  const { host: domain, access, https } = item;
+  const { credentials, hostObj, sources } = params;
+  const { host: domain } = hostObj;
   const cdnClient = CdnService.createClient(credentials);
   const dnsClient = DnsService.createClient(credentials);
   const { topDomain, rrDomainName } = parseDomain(domain);
@@ -79,12 +88,7 @@ const generateDomain = async (params: IDomainParams) => {
   } else {
     CdnService.modifyCdnDomain(cdnClient, { domain, sources });
   }
-
-  await CdnService.setDomainServerCertificate(cdnClient, { domain, https });
-
-  if (get(access, 'referer')) {
-    await CdnService.setCdnDomainReferer(cdnClient, { domain, referer: get(access, 'referer') });
-  }
+  await setDomainAdvancedConfig(cdnClient, { domain, hostObj });
 };
 
 export default async (orinalInputs) => {
@@ -98,8 +102,8 @@ export default async (orinalInputs) => {
   const { hosts } = props;
   if (hosts) {
     await Promise.all(
-      hosts.map(async (item) => {
-        await generateDomain({ credentials, item, sources });
+      hosts.map(async (hostObj) => {
+        await generateDomain({ credentials, hostObj, sources });
       }),
     );
   } else {

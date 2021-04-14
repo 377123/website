@@ -23,17 +23,17 @@ export interface IDomainParams {
 export interface ICertInfo {
   switch: 'on' | 'off';
   certType: 'free' | 'upload' | 'csr';
-  certName: string;
-  serverCertificate: string;
-  privateKey: string;
+  certName?: string;
+  serverCertificate?: string;
+  privateKey?: string;
 }
 
 export type TForceHttps = 'on' | 'off' | 'default';
 export type THttp2 = 'on' | 'off';
 export interface IHttps {
   certInfo: ICertInfo;
-  http2: 'on' | 'off';
-  forceHttps: TForceHttps;
+  http2?: 'on' | 'off';
+  forceHttps?: TForceHttps;
 }
 
 export interface IReferer {

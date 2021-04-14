@@ -8,8 +8,8 @@ import { spawnSync } from 'child_process';
 
 interface ISrc {
   src: string;
-  dist: string;
-  hook: string;
+  dist?: string;
+  hook?: string;
   index: string;
   error: string;
 }

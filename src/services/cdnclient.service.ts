@@ -211,11 +211,14 @@ export default class Client {
   ): Promise<void> {
     const domainServerCertificateRequest = new $Cdn20180510.SetDomainServerCertificateRequest({
       domainName: domain,
-      ...parseCertInfo(https.certInfo),
+      ...parseCertInfo(get(https, 'certInfo', {})),
     });
     await client.setDomainServerCertificate(domainServerCertificateRequest);
-    await Client.setCdnDomainForceHttps(client, { domain, forceHttps: https.forceHttps });
-    await Client.setCdnDomainHttp2(client, { domain, http2: https.http2 });
+    await Client.setCdnDomainForceHttps(client, {
+      domain,
+      forceHttps: get(https, 'forceHttps', 'on'),
+    });
+    await Client.setCdnDomainHttp2(client, { domain, http2: get(https, 'http2', 'off') });
   }
 
   static async setCdnDomainHttp2(
