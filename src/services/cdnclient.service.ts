@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import Cdn20180510, * as $Cdn20180510 from '@alicloud/cdn20180510';
 import * as $OpenApi from '@alicloud/openapi-client';
-import { ICredentials, ICdnSource, IReferer } from '../interface';
-import { parseReferer } from '../utils';
+import { ICredentials, ICdnSource, IReferer, IHttps, TSwitch } from '../interface';
+import { parseReferer, parseHttps } from '../utils';
 import { CDN_ERRORS } from '../contants';
 import get from 'lodash.get';
 
@@ -207,15 +207,14 @@ export default class Client {
    */
   static async setDomainServerCertificate(
     client,
-    { domain, certType = 'free' }: { domain: string; certType?: string },
+    { domain, https }: { domain: string; https?: IHttps },
   ): Promise<void> {
     const domainServerCertificateRequest = new $Cdn20180510.SetDomainServerCertificateRequest({
       domainName: domain,
-      certType,
-      serverCertificateStatus: 'on',
+      ...parseHttps(https.certInfo),
     });
     await client.setDomainServerCertificate(domainServerCertificateRequest);
-    await Client.setCdnDomainForceHttps(client, { domain });
+    await Client.setCdnDomainForceHttps(client, { domain, forceHttps: https.forceHttps });
   }
 
   /**
@@ -223,7 +222,10 @@ export default class Client {
    * @param client
    * @param param1
    */
-  static async setCdnDomainForceHttps(client, { domain }: { domain: string }): Promise<void> {
+  static async setCdnDomainForceHttps(
+    client,
+    { domain }: { domain: string; forceHttps: TSwitch },
+  ): Promise<void> {
     const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
       domainNames: domain,
       functions: JSON.stringify([

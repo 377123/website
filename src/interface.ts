@@ -14,6 +14,27 @@ export interface ICdnSource {
   port: number;
 }
 
+export interface IDomainParams {
+  credentials: ICredentials;
+  sources: ICdnSource;
+  [key: string]: any;
+}
+
+export type TSwitch = 'on' | 'off';
+
+export interface ICertInfo {
+  switch: TSwitch;
+  certType: 'free' | 'upload' | 'csr';
+  certName: string;
+  serverCertificate: string;
+  privateKey: string;
+}
+export interface IHttps {
+  certInfo: ICertInfo;
+  http2: TSwitch;
+  forceHttps: TSwitch;
+}
+
 export interface IReferer {
   refererType: 'blacklist' | 'whitelist';
   allowEmpty: boolean;

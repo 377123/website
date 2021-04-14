@@ -2,7 +2,7 @@ import { loadComponent } from '@serverless-devs/core';
 import cloneDeep from 'lodash.clonedeep';
 import CdnService from './cdnclient.service';
 import DnsService from './dnsclient.service';
-import { ICdnSource } from '../interface';
+import { ICdnSource, IDomainParams } from '../interface';
 import { parseDomain, sleep } from '../utils';
 import chillout from 'chillout';
 import get from 'lodash.get';
@@ -22,7 +22,8 @@ const getCdnOssSources = (region: string, bucket: string): ICdnSource => {
 };
 
 // 生成系统域名
-const generateSystemDomain = async (credentials, inputs, sources: ICdnSource): Promise<any> => {
+const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
+  const { credentials, inputs, sources } = params;
   const { props } = inputs;
   const domainConponent = await loadComponent('domain');
   const cdnClient = CdnService.createClient(credentials);
@@ -41,8 +42,9 @@ const generateSystemDomain = async (credentials, inputs, sources: ICdnSource): P
 };
 
 // 绑定到自定义域名
-const generateDomain = async (credentials, hosts, sources: ICdnSource) => {
-  const { host: domain, access } = hosts;
+const generateDomain = async (params: IDomainParams) => {
+  const { credentials, item, sources } = params;
+  const { host: domain, access, https } = item;
   const cdnClient = CdnService.createClient(credentials);
   const dnsClient = DnsService.createClient(credentials);
   const { topDomain, rrDomainName } = parseDomain(domain);
@@ -78,9 +80,7 @@ const generateDomain = async (credentials, hosts, sources: ICdnSource) => {
     CdnService.modifyCdnDomain(cdnClient, { domain, sources });
   }
 
-  if (domainDetailMode.serverCertificateStatus !== 'on') {
-    await CdnService.setDomainServerCertificate(cdnClient, { domain });
-  }
+  await CdnService.setDomainServerCertificate(cdnClient, { domain, https });
 
   if (get(access, 'referer')) {
     await CdnService.setCdnDomainReferer(cdnClient, { domain, referer: get(access, 'referer') });
@@ -99,10 +99,10 @@ export default async (orinalInputs) => {
   if (hosts) {
     await Promise.all(
       hosts.map(async (item) => {
-        await generateDomain(credentials, item, sources);
+        await generateDomain({ credentials, item, sources });
       }),
     );
   } else {
-    await generateSystemDomain(credentials, inputs, sources);
+    await generateSystemDomain({ credentials, inputs, sources });
   }
 };

@@ -1,9 +1,9 @@
-import { IDomain, IReferer } from './interface';
+import { IDomain, IReferer, ICertInfo } from './interface';
 
 export const parseDomain = (domain: string): IDomain => {
   const arr = domain.split('.');
   return {
-    topDomain: arr.slice(arr.length).join('.'),
+    topDomain: arr.slice(arr.length - 2).join('.'),
     rrDomainName: arr.slice(0, arr.length - 2).join('.'),
   };
 };
@@ -12,8 +12,8 @@ export function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
 }
 
-export function parseReferer(parmas: IReferer) {
-  const { refererType, allowEmpty, referers } = parmas;
+export function parseReferer(params: IReferer) {
+  const { refererType, allowEmpty, referers } = params;
   if (refererType === 'whitelist') {
     return {
       functionName: 'referer_white_list_set',
@@ -41,6 +41,33 @@ export function parseReferer(parmas: IReferer) {
           argValue: referers.join(','),
         },
       ],
+    };
+  }
+}
+
+export function parseHttps(params: ICertInfo) {
+  if (params.certType === 'free') {
+    return {
+      certType: params.certType,
+      serverCertificateStatus: params.switch,
+    };
+  }
+
+  if (params.certType === 'upload') {
+    return {
+      certType: params.certType,
+      serverCertificateStatus: params.switch,
+      certName: params.certName,
+      serverCertificate: params.serverCertificate,
+      privateKey: params.privateKey,
+    };
+  }
+
+  if (params.certType === 'csr') {
+    return {
+      certType: params.certType,
+      serverCertificateStatus: params.switch,
+      serverCertificate: params.serverCertificate,
     };
   }
 }
