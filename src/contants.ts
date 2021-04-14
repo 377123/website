@@ -8,8 +8,8 @@ export const PUT_BUCKET_CORS = [
 
 export const DEFAULT_SRC = {
   src: './',
-  dist: './build',
-  hook: 'npm run build',
+  dist: '',
+  hook: '',
   index: 'index.html',
   error: 'error.html',
 };

@@ -52,7 +52,7 @@ export default async (ossConfig: IOssConfig) => {
     accessKeySecret,
   });
   // 文件上传
-  await put(ossClient, src.dist);
+  await put(ossClient, src.dist || src.src);
 
   // 配置静态托管
   await ossClient.putBucketWebsite(bucket, { index: src.index, error: src.error });

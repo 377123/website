@@ -1,6 +1,7 @@
 import { HLogger, ILogger, getCredential, spinner } from '@serverless-devs/core';
 import get from 'lodash.get';
 import domain from './services/domain.service';
+import env from './services/env.servece';
 import oss, { IOssConfig } from './services/oss.services';
 import { DEFAULT_SRC } from './contants';
 
@@ -22,6 +23,7 @@ export default class WebsiteComponent {
       src: get(inputs, 'props.src', DEFAULT_SRC),
       cors: get(inputs, 'props.cors'),
     };
+    await env(inputs);
     await oss(ossConfig);
     spinner('OSS静态资源部署成功').succeed();
     // 挂载域名
