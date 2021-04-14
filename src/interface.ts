@@ -29,6 +29,7 @@ export interface ICertInfo {
 }
 
 export type TForceHttps = 'on' | 'off' | 'default';
+export type THttp2 = 'on' | 'off';
 export interface IHttps {
   certInfo: ICertInfo;
   http2: 'on' | 'off';

@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import Cdn20180510, * as $Cdn20180510 from '@alicloud/cdn20180510';
 import * as $OpenApi from '@alicloud/openapi-client';
-import { ICredentials, ICdnSource, IReferer, IHttps, TForceHttps } from '../interface';
+import { ICredentials, ICdnSource, IReferer, IHttps, TForceHttps, THttp2 } from '../interface';
 import { parseReferer, parseCertInfo, ForceHttpsEnum } from '../utils';
 import { CDN_ERRORS } from '../contants';
 import get from 'lodash.get';
@@ -215,6 +215,23 @@ export default class Client {
     });
     await client.setDomainServerCertificate(domainServerCertificateRequest);
     await Client.setCdnDomainForceHttps(client, { domain, forceHttps: https.forceHttps });
+    await Client.setCdnDomainHttp2(client, { domain, http2: https.http2 });
+  }
+
+  static async setCdnDomainHttp2(
+    client,
+    { domain, http2 }: { domain: string; http2: THttp2 },
+  ): Promise<any> {
+    const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
+      domainNames: domain,
+      functions: JSON.stringify([
+        {
+          functionArgs: [{ argName: 'http2', argValue: http2 }],
+          functionName: 'https_option',
+        },
+      ]),
+    });
+    await client.batchSetCdnDomainConfig(cdnDomainStagingConfigRequest);
   }
 
   /**
