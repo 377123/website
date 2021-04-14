@@ -45,7 +45,7 @@ export function parseReferer(params: IReferer) {
   }
 }
 
-export function parseHttps(params: ICertInfo) {
+export function parseCertInfo(params: ICertInfo) {
   if (params.certType === 'free') {
     return {
       certType: params.certType,
@@ -70,6 +70,11 @@ export function parseHttps(params: ICertInfo) {
       serverCertificate: params.serverCertificate,
     };
   }
+}
+
+export enum ForceHttpsEnum {
+  off = 'http_force',
+  on = 'https_force',
 }
 
 // TODO: 专门针对publish.yaml来处理default字段。不需要每次都都手动处理

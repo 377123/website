@@ -20,19 +20,19 @@ export interface IDomainParams {
   [key: string]: any;
 }
 
-export type TSwitch = 'on' | 'off';
-
 export interface ICertInfo {
-  switch: TSwitch;
+  switch: 'on' | 'off';
   certType: 'free' | 'upload' | 'csr';
   certName: string;
   serverCertificate: string;
   privateKey: string;
 }
+
+export type TForceHttps = 'on' | 'off' | 'default';
 export interface IHttps {
   certInfo: ICertInfo;
-  http2: TSwitch;
-  forceHttps: TSwitch;
+  http2: 'on' | 'off';
+  forceHttps: TForceHttps;
 }
 
 export interface IReferer {

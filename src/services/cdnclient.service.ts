@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import Cdn20180510, * as $Cdn20180510 from '@alicloud/cdn20180510';
 import * as $OpenApi from '@alicloud/openapi-client';
-import { ICredentials, ICdnSource, IReferer, IHttps, TSwitch } from '../interface';
-import { parseReferer, parseHttps } from '../utils';
+import { ICredentials, ICdnSource, IReferer, IHttps, TForceHttps } from '../interface';
+import { parseReferer, parseCertInfo, ForceHttpsEnum } from '../utils';
 import { CDN_ERRORS } from '../contants';
 import get from 'lodash.get';
 
@@ -211,10 +211,40 @@ export default class Client {
   ): Promise<void> {
     const domainServerCertificateRequest = new $Cdn20180510.SetDomainServerCertificateRequest({
       domainName: domain,
-      ...parseHttps(https.certInfo),
+      ...parseCertInfo(https.certInfo),
     });
     await client.setDomainServerCertificate(domainServerCertificateRequest);
     await Client.setCdnDomainForceHttps(client, { domain, forceHttps: https.forceHttps });
+  }
+
+  /**
+   * @description 删除加速域名的配置
+   * @param client
+   * @param param1
+   */
+  static async DeleteSpecificConfig(
+    client,
+    { domain, configId }: { domain: string; configId: string },
+  ): Promise<any> {
+    const option = new $Cdn20180510.DeleteSpecificConfigRequest({
+      domainName: domain,
+      configId,
+    });
+    await client.deleteSpecificConfig(option);
+  }
+
+  /**
+   * @description 获取加速域名的配置信息。
+   * @param client
+   * @param param1
+   */
+  static async DescribeCdnDomainConfigs(client, { domain }: { domain: string }): Promise<any> {
+    const option = new $Cdn20180510.DescribeCdnDomainConfigsRequest({
+      domainName: domain,
+      functionNames: 'https_force,http_force,https_option,https_tls_version,HSTS',
+    });
+    const result = await client.describeCdnDomainConfigs(option);
+    return get(result, 'body.domainConfigs.domainConfig');
   }
 
   /**
@@ -224,19 +254,32 @@ export default class Client {
    */
   static async setCdnDomainForceHttps(
     client,
-    { domain }: { domain: string; forceHttps: TSwitch },
+    { domain, forceHttps }: { domain: string; forceHttps: TForceHttps },
   ): Promise<void> {
+    const cdnDomainConfigs = await Client.DescribeCdnDomainConfigs(client, { domain });
+    const forceHttpsOptioned = cdnDomainConfigs.find(
+      (item) => item.functionName === ForceHttpsEnum.off || item.functionName === ForceHttpsEnum.on,
+    );
+    // 存在则设置过
+    if (forceHttpsOptioned) {
+      // 当前状态和设置的值相同，直接返回
+      if (forceHttpsOptioned.functionName === ForceHttpsEnum[forceHttps]) return;
+      // 不相同，则需要先删除当前状态
+      await Client.DeleteSpecificConfig(client, { domain, configId: forceHttpsOptioned.configId });
+    }
+    // 默认default，不需要设置
+    if (forceHttps === 'default') return;
+    // 不存在则直接设置
     const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
       domainNames: domain,
       functions: JSON.stringify([
         {
           functionArgs: [{ argName: 'enable', argValue: 'on' }],
-          functionName: 'https_force',
+          functionName: ForceHttpsEnum[forceHttps],
         },
       ]),
     });
-    const cdnResult = await client.batchSetCdnDomainConfig(cdnDomainStagingConfigRequest);
-    return cdnResult;
+    await client.batchSetCdnDomainConfig(cdnDomainStagingConfigRequest);
   }
 
   /**
