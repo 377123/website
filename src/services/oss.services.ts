@@ -13,19 +13,13 @@ interface ISrc {
   index: string;
   error: string;
 }
-
-interface ICors {
-  allowedOrigin: string[];
-  allowedMethod: string[];
-}
-
 export interface IOssConfig {
   accessKeyId: string;
   accessKeySecret: string;
   bucket: string;
   region: string;
   src: ISrc;
-  cors: ICors;
+  cors: OssClient.CORSRule[];
 }
 
 export default async (ossConfig: IOssConfig) => {
@@ -59,7 +53,7 @@ export default async (ossConfig: IOssConfig) => {
 
   // 设置跨域资源共享规则
   if (cors) {
-    await ossClient.putBucketCORS(bucket, [cors]);
+    await ossClient.putBucketCORS(bucket, cors);
   }
 };
 
