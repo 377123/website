@@ -119,4 +119,13 @@ export default class Client {
         domain: string;
         ipFilter: IIpFilter;
     }): Promise<any>;
+    /**
+     * @description UA黑/白名单
+     * @param client
+     * @param param1
+     */
+    static setCdnDomainUaFilter(client: any, { domain, uaFilter }: {
+        domain: string;
+        uaFilter: IIpFilter;
+    }): Promise<any>;
 }

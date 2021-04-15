@@ -13,7 +13,7 @@ import {
   RefererEnum,
   IpFilterEnum,
 } from '../interface';
-import { parseReferer, parseCertInfo, parseIpFilter } from '../utils';
+import { parseReferer, parseCertInfo, parseIpFilter, parseUaFilter } from '../utils';
 import { CDN_ERRORS } from '../contants';
 import get from 'lodash.get';
 
@@ -398,6 +398,46 @@ export default class Client {
     const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
       domainNames: domain,
       functions: JSON.stringify([parseIpFilter(ipFilter)]),
+    });
+    await client.batchSetCdnDomainConfig(cdnDomainStagingConfigRequest);
+  }
+
+  /**
+   * @description UA黑/白名单
+   * @param client
+   * @param param1
+   */
+  static async setCdnDomainUaFilter(
+    client,
+    { domain, uaFilter }: { domain: string; uaFilter: IIpFilter },
+  ) {
+    const cdnDomainConfigs = await Client.DescribeCdnDomainConfigs(client, {
+      domain,
+      functionNames: 'ali_ua',
+    });
+    const uaFilterOptioned = cdnDomainConfigs.find((item) => item.functionName === 'ali_ua');
+    // 开启
+    if (uaFilter.switch === 'on') {
+      // 存在则设置过
+      if (uaFilterOptioned) {
+        // 当前状态和设置的值不相同，则需要先删除
+        if (uaFilter.type !== uaFilterOptioned.functionName) {
+          await Client.DeleteSpecificConfig(client, {
+            domain,
+            configId: uaFilterOptioned.configId,
+          });
+        }
+      }
+    } else if (uaFilterOptioned) {
+      // 未开启，且设置过 则删除
+      return await Client.DeleteSpecificConfig(client, {
+        domain,
+        configId: uaFilterOptioned.configId,
+      });
+    }
+    const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
+      domainNames: domain,
+      functions: JSON.stringify([parseUaFilter(uaFilter)]),
     });
     await client.batchSetCdnDomainConfig(cdnDomainStagingConfigRequest);
   }

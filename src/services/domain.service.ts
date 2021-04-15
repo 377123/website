@@ -38,6 +38,12 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
   if (ipFilter) {
     await CdnService.setCdnDomainIpFilter(cdnClient, { domain, ipFilter });
   }
+
+  // UA黑/白名单
+  const uaFilter = get(access, 'uaFilter');
+  if (uaFilter) {
+    await CdnService.setCdnDomainUaFilter(cdnClient, { domain, uaFilter });
+  }
 };
 
 // 生成系统域名

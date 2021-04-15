@@ -70,6 +70,33 @@ export function parseIpFilter(params: IIpFilter) {
   }
 }
 
+export function parseUaFilter(params: IIpFilter) {
+  const { type, rules } = params;
+  if (type === 'whitelist') {
+    return {
+      functionName: 'ali_ua',
+      functionArgs: [
+        {
+          argName: 'ua',
+          argValue: rules.join('|'),
+        },
+        { argName: 'type', argValue: 'white' },
+      ],
+    };
+  } else {
+    return {
+      functionName: 'ali_ua',
+      functionArgs: [
+        {
+          argName: 'ua',
+          argValue: rules.join('|'),
+        },
+        { argName: 'type', argValue: 'black' },
+      ],
+    };
+  }
+}
+
 export function parseCertInfo(params: ICertInfo) {
   if (params.certType === 'free') {
     return {

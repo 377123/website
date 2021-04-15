@@ -15,6 +15,13 @@ export declare function parseIpFilter(params: IIpFilter): {
         argValue: string;
     }[];
 };
+export declare function parseUaFilter(params: IIpFilter): {
+    functionName: string;
+    functionArgs: {
+        argName: string;
+        argValue: string;
+    }[];
+};
 export declare function parseCertInfo(params: ICertInfo): {
     certType: "upload";
     serverCertificateStatus: "on" | "off";

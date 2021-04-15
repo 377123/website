@@ -46,9 +46,9 @@ services:
                 - '127.0.0.0/24'
                 - '127.0.0.0/25'
             uaFilter:
-              switch: on
+              switch: off
               type: whitelist
               rules:
-                - 'aliyun.com'
-                - 'taobao.com'
+                - 'IE'
+                - '*chrome*'
 
