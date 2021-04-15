@@ -1,4 +1,4 @@
-import { IDomain, IReferer, ICertInfo } from './interface';
+import { IDomain, IReferer, ICertInfo, IIpFilter, RefererEnum, IpFilterEnum } from './interface';
 
 export const parseDomain = (domain: string): IDomain => {
   const arr = domain.split('.');
@@ -16,7 +16,7 @@ export function parseReferer(params: IReferer) {
   const { refererType, allowEmpty, referers } = params;
   if (refererType === 'whitelist') {
     return {
-      functionName: 'referer_white_list_set',
+      functionName: RefererEnum.whitelist,
       functionArgs: [
         {
           argName: 'allow_empty',
@@ -30,7 +30,7 @@ export function parseReferer(params: IReferer) {
     };
   } else {
     return {
-      functionName: 'referer_black_list_set',
+      functionName: RefererEnum.blacklist,
       functionArgs: [
         {
           argName: 'allow_empty',
@@ -39,6 +39,31 @@ export function parseReferer(params: IReferer) {
         {
           argName: 'refer_domain_deny_list',
           argValue: referers.join(','),
+        },
+      ],
+    };
+  }
+}
+
+export function parseIpFilter(params: IIpFilter) {
+  const { ipType, ips } = params;
+  if (ipType === 'whitelist') {
+    return {
+      functionName: IpFilterEnum.whitelist,
+      functionArgs: [
+        {
+          argName: 'ip_list',
+          argValue: ips.join(','),
+        },
+      ],
+    };
+  } else {
+    return {
+      functionName: IpFilterEnum.blacklist,
+      functionArgs: [
+        {
+          argName: 'ip_list',
+          argValue: ips.join(','),
         },
       ],
     };
@@ -74,11 +99,6 @@ export function parseCertInfo(params: ICertInfo) {
     certType: 'free',
     serverCertificateStatus: 'on',
   };
-}
-
-export enum ForceHttpsEnum {
-  off = 'http_force',
-  on = 'https_force',
 }
 
 // TODO: 专门针对publish.yaml来处理default字段。不需要每次都都手动处理

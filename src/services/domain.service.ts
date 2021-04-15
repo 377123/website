@@ -27,10 +27,16 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
   if (https) {
     await CdnService.setDomainServerCertificate(cdnClient, { domain, https });
   }
-  // referer 防盗链
+  // Referer 防盗链
   const referer = get(access, 'referer');
   if (referer) {
     await CdnService.setCdnDomainReferer(cdnClient, { domain, referer });
+  }
+
+  // IP黑/白名单
+  const ipFilter = get(access, 'ipFilter');
+  if (ipFilter) {
+    await CdnService.setCdnDomainIpFilter(cdnClient, { domain, ipFilter });
   }
 };
 

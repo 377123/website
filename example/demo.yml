@@ -28,8 +28,7 @@ access:
 
     ipFilter:
     	ipType: blacklist|whiteList
-        allowEmpty: true
-        referers:
+        ips:
           - 'qq.baidu.com'
           - '*.baidu.com'
 	uaFilter:

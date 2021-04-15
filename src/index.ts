@@ -12,8 +12,8 @@ export default class WebsiteComponent {
    * @param inputs
    */
   async deploy(inputs: any) {
-    const credentials = get(inputs, 'credentials') || {};
-    reportComponent('website', {
+    const credentials = get(inputs, 'credentials', {});
+    await reportComponent('website', {
       uid: credentials.AccountID,
       command: 'deploy',
     });

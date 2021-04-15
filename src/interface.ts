@@ -41,3 +41,23 @@ export interface IReferer {
   allowEmpty: boolean;
   referers: string[];
 }
+
+export interface IIpFilter {
+  ipType: 'blacklist' | 'whitelist';
+  ips: string[];
+}
+
+export enum ForceHttpsEnum {
+  off = 'http_force',
+  on = 'https_force',
+}
+
+export enum RefererEnum {
+  whitelist = 'referer_white_list_set',
+  blacklist = 'referer_black_list_set',
+}
+
+export enum IpFilterEnum {
+  whitelist = 'ip_allow_list_set',
+  blacklist = 'ip_black_list_set',
+}

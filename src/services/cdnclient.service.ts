@@ -1,8 +1,19 @@
 /* eslint-disable no-console */
 import Cdn20180510, * as $Cdn20180510 from '@alicloud/cdn20180510';
 import * as $OpenApi from '@alicloud/openapi-client';
-import { ICredentials, ICdnSource, IReferer, IHttps, TForceHttps, THttp2 } from '../interface';
-import { parseReferer, parseCertInfo, ForceHttpsEnum } from '../utils';
+import {
+  ICredentials,
+  ICdnSource,
+  IReferer,
+  IHttps,
+  TForceHttps,
+  THttp2,
+  IIpFilter,
+  ForceHttpsEnum,
+  RefererEnum,
+  IpFilterEnum,
+} from '../interface';
+import { parseReferer, parseCertInfo, parseIpFilter } from '../utils';
 import { CDN_ERRORS } from '../contants';
 import get from 'lodash.get';
 
@@ -35,7 +46,7 @@ export default class Client {
   static async setEsStagingConfig(
     credentials: ICredentials,
     { domain, rule }: { domain: string; rule: string },
-  ): Promise<any> {
+  ): Promise<void> {
     const client = Client.createClient(credentials);
     const setCdnDomainStagingConfigRequest = new $Cdn20180510.SetCdnDomainStagingConfigRequest({
       domainName: domain,
@@ -167,8 +178,7 @@ export default class Client {
       sources: JSON.stringify([].concat(sources)),
     });
     try {
-      const cdnResult = await client.addCdnDomain(addCdnDomainRequest);
-      return cdnResult;
+      await client.addCdnDomain(addCdnDomainRequest);
     } catch (error) {
       const message = get(error, 'message', '');
       const messageCode = message.split(':')[0];
@@ -191,8 +201,7 @@ export default class Client {
       sources: JSON.stringify([].concat(sources)),
     });
     try {
-      const cdnResult = await client.modifyCdnDomain(addCdnDomainRequest);
-      return cdnResult;
+      await client.modifyCdnDomain(addCdnDomainRequest);
     } catch (error) {
       const message = get(error, 'message', '');
       const messageCode = message.split(':')[0];
@@ -224,7 +233,7 @@ export default class Client {
   static async setCdnDomainHttp2(
     client,
     { domain, http2 }: { domain: string; http2: THttp2 },
-  ): Promise<any> {
+  ): Promise<void> {
     const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
       domainNames: domain,
       functions: JSON.stringify([
@@ -258,10 +267,13 @@ export default class Client {
    * @param client
    * @param param1
    */
-  static async DescribeCdnDomainConfigs(client, { domain }: { domain: string }): Promise<any> {
+  static async DescribeCdnDomainConfigs(
+    client,
+    { domain, functionNames }: { domain: string; functionNames: string },
+  ): Promise<any> {
     const option = new $Cdn20180510.DescribeCdnDomainConfigsRequest({
       domainName: domain,
-      functionNames: 'https_force,http_force,https_option,https_tls_version,HSTS',
+      functionNames,
     });
     const result = await client.describeCdnDomainConfigs(option);
     return get(result, 'body.domainConfigs.domainConfig');
@@ -276,7 +288,10 @@ export default class Client {
     client,
     { domain, forceHttps }: { domain: string; forceHttps: TForceHttps },
   ): Promise<void> {
-    const cdnDomainConfigs = await Client.DescribeCdnDomainConfigs(client, { domain });
+    const cdnDomainConfigs = await Client.DescribeCdnDomainConfigs(client, {
+      domain,
+      functionNames: `${ForceHttpsEnum.off},${ForceHttpsEnum.on}`,
+    });
     const forceHttpsOptioned = cdnDomainConfigs.find(
       (item) => item.functionName === ForceHttpsEnum.off || item.functionName === ForceHttpsEnum.on,
     );
@@ -310,13 +325,59 @@ export default class Client {
   static async setCdnDomainReferer(
     client,
     { domain, referer }: { domain: string; referer: IReferer },
-  ): Promise<any> {
+  ) {
+    const cdnDomainConfigs = await Client.DescribeCdnDomainConfigs(client, {
+      domain,
+      functionNames: `${RefererEnum.whitelist},${RefererEnum.blacklist}`,
+    });
+    const refererOptioned = cdnDomainConfigs.find(
+      (item) =>
+        item.functionName === RefererEnum.whitelist || item.functionName === RefererEnum.blacklist,
+    );
+    // 存在则设置过
+    if (refererOptioned) {
+      // 当前状态和设置的值不相同，则需要先删除
+      if (referer.refererType !== refererOptioned.functionName) {
+        await Client.DeleteSpecificConfig(client, { domain, configId: refererOptioned.configId });
+      }
+    }
     const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
       domainNames: domain,
       functions: JSON.stringify([parseReferer(referer)]),
     });
-    const cdnResult = await client.batchSetCdnDomainConfig(cdnDomainStagingConfigRequest);
-    return cdnResult;
+    await client.batchSetCdnDomainConfig(cdnDomainStagingConfigRequest);
+  }
+
+  /**
+   * @description IP黑/白名单
+   * @param client
+   * @param param1
+   */
+  static async setCdnDomainIpFilter(
+    client,
+    { domain, ipFilter }: { domain: string; ipFilter: IIpFilter },
+  ) {
+    const cdnDomainConfigs = await Client.DescribeCdnDomainConfigs(client, {
+      domain,
+      functionNames: `${IpFilterEnum.whitelist},${IpFilterEnum.blacklist}`,
+    });
+    const ipFilterOptioned = cdnDomainConfigs.find(
+      (item) =>
+        item.functionName === IpFilterEnum.whitelist ||
+        item.functionName === IpFilterEnum.blacklist,
+    );
+    // 存在则设置过
+    if (ipFilterOptioned) {
+      // 当前状态和设置的值不相同，则需要先删除
+      if (ipFilter.ipType !== ipFilterOptioned.functionName) {
+        await Client.DeleteSpecificConfig(client, { domain, configId: ipFilterOptioned.configId });
+      }
+    }
+    const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
+      domainNames: domain,
+      functions: JSON.stringify([parseIpFilter(ipFilter)]),
+    });
+    await client.batchSetCdnDomainConfig(cdnDomainStagingConfigRequest);
   }
 
   /**
