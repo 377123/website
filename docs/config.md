@@ -25,14 +25,14 @@ services:
           https:
             certInfo:
               switch: on
-              certType: free 
-            http2: off 
-            forceHttps: on 
+              certType: free
+            http2: off
+            forceHttps: on
           access:
             referer:
               refererType: whitelist
-              allowEmpty: true 
-              referers: 
+              allowEmpty: true
+              referers:
                 - 'aliyun.com'
                 - 'taobao.com'
 ```
@@ -41,14 +41,14 @@ services:
 
 主要参数描述
 
-| 参数名称           | 必选 | 类型            |    默认值     | 描述                                                                                      |
-| ------------------ | :--: | :-------------- | :-----------: | :---------------------------------------------------------------------------------------- |
-| src                |  是  | [Src](#Src)[]   |               | 该项目的代码信息，参数参考执行目录                                                        |
-| bucket             |  是  | string          |               | Bucket 名称。 不允许大写字母。如果你不加 AppId 后缀，则默认自动会为你加上。               |
-| region             |  否  | string          | `cn-hangzhou` | 代码上传所在的 cos 区域。区。                                                             |
-| env                |  否  | [Env](#Env)     |               | 环境变量参数文件。会将 env 下配置的参数写入 env.js 文件中，将该文件打包上传到你的代码里。 |
-| cors               |  否  | [Cors](#Cors)[] |               | 跨域访问配置                                                                              |
-| hosts              |  否  | [Cdn](#Cdn)[]   |               | CND 加速域名配置                                                                          |
+| 参数名称 | 必选 | 类型            |    默认值     | 描述                                                                                      |
+| -------- | :--: | :-------------- | :-----------: | :---------------------------------------------------------------------------------------- |
+| src      |  是  | [Src](#Src)[]   |               | 该项目的代码信息，参数参考执行目录                                                        |
+| bucket   |  是  | string          |               | Bucket 名称。 不允许大写字母。如果你不加 AppId 后缀，则默认自动会为你加上。               |
+| region   |  否  | string          | `cn-hangzhou` | 代码上传所在的 cos 区域。区。                                                             |
+| env      |  否  | [Env](#Env)     |               | 环境变量参数文件。会将 env 下配置的参数写入 env.js 文件中，将该文件打包上传到你的代码里。 |
+| cors     |  否  | [Cors](#Cors)[] |               | 跨域访问配置                                                                              |
+| hosts    |  否  | [Cdn](#Cdn)[]   |               | CND 加速域名配置                                                                          |
 
 ### Src
 
@@ -66,10 +66,13 @@ services:
 
 跨域配置
 
-| 参数           | 必选 | 类型     | Description                                                                                    |
-| -------------- | :--: | :------- | :--------------------------------------------------------------------------------------------- |
-| allowedMethod |  是  | string[] | 允许的 HTTP 操作，枚举值：GET，PUT，HEAD，POST，DELETE                                         |
-| allowedOrigin |  是  | string[] | 允许的访问来源，支持通配符`*`，格式为：`协议://域名[:端口]`，例如：`http://www.qq.com`         |
+| 参数          | 必选 | 类型     | Description                                                                            |
+| ------------- | :--: | :------- | :------------------------------------------------------------------------------------- |
+| allowedMethod |  是  | string[] | 允许的 HTTP 操作，枚举值：GET，PUT，HEAD，POST，DELETE                                 |
+| allowedOrigin |  是  | string[] | 允许的访问来源，支持通配符`*`，格式为：`协议://域名[:端口]`，例如：`http://www.aliyun.com` |
+| allowedHeader |  否  | string[] | 指定允许跨域请求的响应头，支持通配符`*`                                                |
+| exposeHeader  |  否  | string[] | 指定允许用户从应用程序中访问的响应头，不允许使用通配符`*`                              |
+| maxAgeSeconds |  否  | string[] | 指定浏览器对特定资源的预取（OPTIONS）请求返回结果的缓存时间。                          |
 
 ### Cdn
 
