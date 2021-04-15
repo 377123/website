@@ -1,2 +1,2 @@
-declare const _default: (inputs: any) => Promise<void>;
+declare const _default: (inputs: any) => any;
 export default _default;

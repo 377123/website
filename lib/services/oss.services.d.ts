@@ -14,5 +14,5 @@ export interface IOssConfig {
     src: ISrc;
     cors: OssClient.CORSRule[];
 }
-declare const _default: (ossConfig: IOssConfig) => Promise<void>;
+declare const _default: (ossConfig: IOssConfig) => any;
 export default _default;
