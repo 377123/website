@@ -37,14 +37,16 @@ export interface IHttps {
 }
 
 export interface IReferer {
-  refererType: 'blacklist' | 'whitelist';
+  switch: 'on' | 'off';
+  type: 'blacklist' | 'whitelist';
   allowEmpty: boolean;
-  referers: string[];
+  rules: string[];
 }
 
 export interface IIpFilter {
-  ipType: 'blacklist' | 'whitelist';
-  ips: string[];
+  switch: 'on' | 'off';
+  type: 'blacklist' | 'whitelist';
+  rules: string[];
 }
 
 export enum ForceHttpsEnum {

@@ -31,7 +31,25 @@ export interface IHttps {
     forceHttps?: TForceHttps;
 }
 export interface IReferer {
-    refererType: 'blacklist' | 'whitelist';
+    switch: 'on' | 'off';
+    type: 'blacklist' | 'whitelist';
     allowEmpty: boolean;
-    referers: string[];
+    rules: string[];
+}
+export interface IIpFilter {
+    switch: 'on' | 'off';
+    type: 'blacklist' | 'whitelist';
+    rules: string[];
+}
+export declare enum ForceHttpsEnum {
+    off = "http_force",
+    on = "https_force"
+}
+export declare enum RefererEnum {
+    whitelist = "referer_white_list_set",
+    blacklist = "referer_black_list_set"
+}
+export declare enum IpFilterEnum {
+    whitelist = "ip_allow_list_set",
+    blacklist = "ip_black_list_set"
 }

@@ -48,7 +48,7 @@
     }
   },
   "lint-staged": {
-    "**/*.{js,jsx,ts}": "f2elint exec eslint"
+    "src/*.{js,jsx,ts}": "f2elint exec eslint"
   },
   "jest": {
     "preset": "ts-jest",

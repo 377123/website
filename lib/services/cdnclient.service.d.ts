@@ -1,5 +1,5 @@
 import Cdn20180510 from '@alicloud/cdn20180510';
-import { ICredentials, ICdnSource, IReferer, IHttps, TForceHttps, THttp2 } from '../interface';
+import { ICredentials, ICdnSource, IReferer, IHttps, TForceHttps, THttp2, IIpFilter } from '../interface';
 export default class Client {
     /**
      * 使用AK&SK初始化账号Client
@@ -17,7 +17,7 @@ export default class Client {
     static setEsStagingConfig(credentials: ICredentials, { domain, rule }: {
         domain: string;
         rule: string;
-    }): Promise<any>;
+    }): Promise<void>;
     /**
      * 将edge script灰度配置发布到线上环境
      * @param credentials
@@ -73,7 +73,7 @@ export default class Client {
     static setCdnDomainHttp2(client: any, { domain, http2 }: {
         domain: string;
         http2: THttp2;
-    }): Promise<any>;
+    }): Promise<void>;
     /**
      * @description 删除加速域名的配置
      * @param client
@@ -88,8 +88,9 @@ export default class Client {
      * @param client
      * @param param1
      */
-    static DescribeCdnDomainConfigs(client: any, { domain }: {
+    static DescribeCdnDomainConfigs(client: any, { domain, functionNames }: {
         domain: string;
+        functionNames: string;
     }): Promise<any>;
     /**
      * @description 强制HTTPS跳转
@@ -108,5 +109,14 @@ export default class Client {
     static setCdnDomainReferer(client: any, { domain, referer }: {
         domain: string;
         referer: IReferer;
+    }): Promise<any>;
+    /**
+     * @description IP黑/白名单
+     * @param client
+     * @param param1
+     */
+    static setCdnDomainIpFilter(client: any, { domain, ipFilter }: {
+        domain: string;
+        ipFilter: IIpFilter;
     }): Promise<any>;
 }

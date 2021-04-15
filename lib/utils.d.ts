@@ -1,8 +1,15 @@
-import { IDomain, IReferer, ICertInfo } from './interface';
+import { IDomain, IReferer, ICertInfo, IIpFilter, RefererEnum, IpFilterEnum } from './interface';
 export declare const parseDomain: (domain: string) => IDomain;
 export declare function sleep(msec: any): Promise<unknown>;
 export declare function parseReferer(params: IReferer): {
-    functionName: string;
+    functionName: RefererEnum;
+    functionArgs: {
+        argName: string;
+        argValue: string;
+    }[];
+};
+export declare function parseIpFilter(params: IIpFilter): {
+    functionName: IpFilterEnum;
     functionArgs: {
         argName: string;
         argValue: string;
@@ -27,7 +34,3 @@ export declare function parseCertInfo(params: ICertInfo): {
     serverCertificate?: undefined;
     privateKey?: undefined;
 };
-export declare enum ForceHttpsEnum {
-    off = "http_force",
-    on = "https_force"
-}

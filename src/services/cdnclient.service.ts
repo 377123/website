@@ -334,13 +334,23 @@ export default class Client {
       (item) =>
         item.functionName === RefererEnum.whitelist || item.functionName === RefererEnum.blacklist,
     );
-    // 存在则设置过
-    if (refererOptioned) {
-      // 当前状态和设置的值不相同，则需要先删除
-      if (referer.refererType !== refererOptioned.functionName) {
-        await Client.DeleteSpecificConfig(client, { domain, configId: refererOptioned.configId });
+    // 开启
+    if (referer.switch === 'on') {
+      // 存在则设置过
+      if (refererOptioned) {
+        // 当前状态和设置的值不相同，则需要先删除
+        if (referer.type !== refererOptioned.functionName) {
+          await Client.DeleteSpecificConfig(client, { domain, configId: refererOptioned.configId });
+        }
       }
+    } else if (refererOptioned) {
+      // 未开启，且设置过 则删除
+      return await Client.DeleteSpecificConfig(client, {
+        domain,
+        configId: refererOptioned.configId,
+      });
     }
+
     const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
       domainNames: domain,
       functions: JSON.stringify([parseReferer(referer)]),
@@ -366,12 +376,24 @@ export default class Client {
         item.functionName === IpFilterEnum.whitelist ||
         item.functionName === IpFilterEnum.blacklist,
     );
-    // 存在则设置过
-    if (ipFilterOptioned) {
-      // 当前状态和设置的值不相同，则需要先删除
-      if (ipFilter.ipType !== ipFilterOptioned.functionName) {
-        await Client.DeleteSpecificConfig(client, { domain, configId: ipFilterOptioned.configId });
+    // 开启
+    if (ipFilter.switch === 'on') {
+      // 存在则设置过
+      if (ipFilterOptioned) {
+        // 当前状态和设置的值不相同，则需要先删除
+        if (ipFilter.type !== ipFilterOptioned.functionName) {
+          await Client.DeleteSpecificConfig(client, {
+            domain,
+            configId: ipFilterOptioned.configId,
+          });
+        }
       }
+    } else if (ipFilterOptioned) {
+      // 未开启，且设置过 则删除
+      return await Client.DeleteSpecificConfig(client, {
+        domain,
+        configId: ipFilterOptioned.configId,
+      });
     }
     const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
       domainNames: domain,

@@ -33,13 +33,22 @@ services:
             forceHttps: off # on off default
           access:
             referer:
-              refererType: whitelist
+              switch: off
+              type: whitelist
               allowEmpty: true 
-              referers: 
+              rules: 
                 - 'aliyun.com'
                 - 'taobao.com'
             ipFilter:
-              ipType: whitelist
-              ips:
+              switch: off
+              type: whitelist
+              rules:
+                - '127.0.0.0/24'
+                - '127.0.0.0/25'
+            uaFilter:
+              switch: on
+              type: whitelist
+              rules:
                 - 'aliyun.com'
                 - 'taobao.com'
+

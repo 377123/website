@@ -13,8 +13,8 @@ export function sleep(msec) {
 }
 
 export function parseReferer(params: IReferer) {
-  const { refererType, allowEmpty, referers } = params;
-  if (refererType === 'whitelist') {
+  const { type, allowEmpty, rules } = params;
+  if (type === 'whitelist') {
     return {
       functionName: RefererEnum.whitelist,
       functionArgs: [
@@ -24,7 +24,7 @@ export function parseReferer(params: IReferer) {
         },
         {
           argName: 'refer_domain_allow_list',
-          argValue: referers.join(','),
+          argValue: rules.join(','),
         },
       ],
     };
@@ -38,7 +38,7 @@ export function parseReferer(params: IReferer) {
         },
         {
           argName: 'refer_domain_deny_list',
-          argValue: referers.join(','),
+          argValue: rules.join(','),
         },
       ],
     };
@@ -46,14 +46,14 @@ export function parseReferer(params: IReferer) {
 }
 
 export function parseIpFilter(params: IIpFilter) {
-  const { ipType, ips } = params;
-  if (ipType === 'whitelist') {
+  const { type, rules } = params;
+  if (type === 'whitelist') {
     return {
       functionName: IpFilterEnum.whitelist,
       functionArgs: [
         {
           argName: 'ip_list',
-          argValue: ips.join(','),
+          argValue: rules.join(','),
         },
       ],
     };
@@ -63,7 +63,7 @@ export function parseIpFilter(params: IIpFilter) {
       functionArgs: [
         {
           argName: 'ip_list',
-          argValue: ips.join(','),
+          argValue: rules.join(','),
         },
       ],
     };
