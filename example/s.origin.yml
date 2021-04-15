@@ -1,0 +1,42 @@
+edition: 1.0.0
+services:
+  website:
+    component: /Users/shihuali/workspace/website/lib/index.js # 指向项目路径
+    access: my
+    props:
+      bucket: shl-website-test01
+      src:
+        src: './src'
+        dist: './build'
+        hook: npm run build
+        index: index.html
+        error: index.html
+      region: cn-hangzhou
+      cors:
+        - allowedOrigin: '*'
+          allowedMethod: 
+            - GET
+            - POST
+          allowedHeader: age
+          exposeHeader: age
+          maxAgeSeconds: 10
+      hosts:
+        # - host: shl5.shihuali.top
+        - host: auto
+
+      #     # https:
+      #     #   certInfo:
+      #     #     switch: on
+      #     #     certType: free # free upload csr
+      #     #     certName: my-cert
+      #     #     serverCertificate: "-----BEGIN CERTIFICATE-----\nMIIFhjCCBG6gAwIBAgIQCAE2yMfQPAo0CswqcP+KKzANBgkqhkiG9w0BAQsFADBu\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\nd3cuZGlnaWNlcnQuY29tMS0wKwYDVQQDEyRFbmNyeXB0aW9uIEV2ZXJ5d2hlcmUg\nRFYgVExTIENBIC0gRzEwHhcNMjEwMzI5MDAwMDAwWhcNMjIwMzI5MjM1OTU5WjAX\nMRUwEwYDVQQDEwxzaGlodWFsaS50b3AwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAw\nggEKAoIBAQDP8IXbZwloLgj5/Am97kCAx5J5JhwENk7Bbbvh0fGDJukdC4osb1bc\nnrk5WShEV/yWXozxwHh5lMipvO42h1agi7ycz0muq5IAko4KrbfMwinJ0JuF9lXI\nK1t/xYSyKyIeBExzGyCCTTb//3ZtWdE79ku1lJSeneqEDWurYCXV8tRoiXj3tPtw\nXY3ci9rJSvYGnjrs36Szejb+Dtlifrdv6dKrRuTekuVV8cI/vA4T3uQfWouBO5JP\nnufAfkgNI53xDm7N10L0ND8U7nI+XfqPF8lyDPUw0VCEhySYhtMpz8FjfofyES7Q\n3tvCR+cXJWGF3XKbmbGCZeyxMBtR8Y7rAgMBAAGjggJ1MIICcTAfBgNVHSMEGDAW\ngBRVdE+yck/1YLpQ0dfmUVyaAYca1zAdBgNVHQ4EFgQUzgN569xnuUX8awTY7gGN\nhR/ZOocwKQYDVR0RBCIwIIIMc2hpaHVhbGkudG9wghB3d3cuc2hpaHVhbGkudG9w\nMA4GA1UdDwEB/wQEAwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIw\nPgYDVR0gBDcwNTAzBgZngQwBAgEwKTAnBggrBgEFBQcCARYbaHR0cDovL3d3dy5k\naWdpY2VydC5jb20vQ1BTMIGABggrBgEFBQcBAQR0MHIwJAYIKwYBBQUHMAGGGGh0\ndHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBKBggrBgEFBQcwAoY+aHR0cDovL2NhY2Vy\ndHMuZGlnaWNlcnQuY29tL0VuY3J5cHRpb25FdmVyeXdoZXJlRFZUTFNDQS1HMS5j\ncnQwCQYDVR0TBAIwADCCAQUGCisGAQQB1nkCBAIEgfYEgfMA8QB3AEalVet1+pEg\nMLWiiWn0830RLEF0vv1JuIWr8vxw/m1HAAABeH38APQAAAQDAEgwRgIhAI5GTWAJ\n+PEO5cjGfh7AIUffh1aarFK2uioNzu4BkPIWAiEA6k9ef6vAnodkW5cPrQBGU522\ngyVTNYU6924NeetZpTEAdgAiRUUHWVUkVpY/oS/x922G4CMmY63AS39dxoNcbuIP\nAgAAAXh9/AEEAAAEAwBHMEUCIDYU7K3/IPiV8/hg9Cpab6ssp8M60op+ElsZT4/W\nuXVyAiEA+W55U9guav81M6czc8TuL0B4aPw0NzkROdcTQkgqCHIwDQYJKoZIhvcN\nAQELBQADggEBAKc6/l5k2wUqAiEkKRMiRFocxVY0kFUlaLntES3AAKLnlq/ZaOeV\n66Kmg7nLCIBajpCyDw9ywgkONxMgwozn/kYYWQ+ne/derYSEfnjr8tp090m+qCqs\nog7KVVX8wU7e+GiT+eRSA8JGYW057BPJHvm4VC8+5COeCxOKBS7EXGo+5bcbIf+f\nX7M5drzR6yZ2E/WgzewPkXL4BWNiwt1H9GT3xTEBaSiNPLIC6L9j+FxN6wqSnWa6\nsEg4vFzo+SdRVBpq7T2tCD9IWYkw4VJo4jSlxg6N2KphZnQjEiZoni6iawHSxavs\njAzFOBuOUwXIYVaYKujFpex8wjVUmtudUHo=\n-----END CERTIFICATE-----"
+      #     #     privateKey: "-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAz/CF22cJaC4I+fwJve5AgMeSeSYcBDZOwW274dHxgybpHQuK\nLG9W3J65OVkoRFf8ll6M8cB4eZTIqbzuNodWoIu8nM9JrquSAJKOCq23zMIpydCb\nhfZVyCtbf8WEsisiHgRMcxsggk02//92bVnRO/ZLtZSUnp3qhA1rq2Al1fLUaIl4\n97T7cF2N3IvayUr2Bp467N+ks3o2/g7ZYn63b+nSq0bk3pLlVfHCP7wOE97kH1qL\ngTuST57nwH5IDSOd8Q5uzddC9DQ/FO5yPl36jxfJcgz1MNFQhIckmIbTKc/BY36H\n8hEu0N7bwkfnFyVhhd1ym5mxgmXssTAbUfGO6wIDAQABAoIBAClBTKVvh2fCfmhu\nj1Y971E9hzt/Cp7xUWXCCj0u5I5DSYvILtVLD748xX3xyPHqTQReZPNP3vcsRDWc\n9NwftNmsb7Li03kStChl60WGGsnGmfje6QRGj9VjeMdcXkvlD+NJsgtCTgxcGnXm\n7s2aPM97OaEghe4EYbNqYDrDnC4aoB1J4QOkQSBkU2//yIZ8oTe3Hjakj51dTfpY\n+wFiquIf41gjL4y53D0tpz0p2wYfn+bdqPdpFSImhgLEGJHpgJd8uZYQ9irzrGLX\n7c/fY9CoJWkRgVyvhme6eUfgxd5ZlIDNSPpupK4EDz8XV077wcE8bpqQgPndEqpx\n7MsMgakCgYEA+hw3BYpkkkTpuwY+ZZGvGL+owOdw6Lqu7cx71Iyhk9ydnw8siZke\nCqVuDVRBW2+KxyhvvOqx3xSynfsCqFetgOfRD4Gtjm0vjkdgYYGHJgbnfmQyLk99\n5SDPQrDnLuM+1Sbt0meleXDG6Baxivztav+SJLDs7smxklJ144nIwskCgYEA1NYV\nMaWyXaOkVua89p1drJSnLUKokHEmz6TAwhqSx6xnr/jJPHNfMpQMCBuB8IN0pd5s\naPRaTJRYXXlTWq5DiJW4j9f64ZsiHkpdNxC1U5TCshmAhCbqyvtuOj2A/d2oJfc0\n73hLiQYaOwS8OQfgoT5v7ZxA211CnKGjFstVShMCgYEAmwLlrw9o6abAXeOuxHCY\nXvRaeMR4nCUnycZUcRWABw5SuoRDDDzT+7EwFh7EKxFkp66OIj4rY6GGWpd5vDAr\nHpuOXNf4Yy+Uq8/dElGfG5hn3VPoLf+ifWHqUuElR1AcXyszdpY6XpvhC3MVMpkz\n5H7laswk7JIg9hkZa563yNECgYEApKloRjvKbhWfnDfxc961zUJIwIR0wyM3gqgV\nFVbXvjFNGuCgV+tueEP/tvoJIpmhUn5tYxnBDsQqRU8LRPnTd8VVv7u59nc+Ay9H\nRMXhc2OA6ac/PX6aYiX51ock18N4Rr8lritkTQNyobx9HqZQjI8wqyUbLFvPoDyR\nX546Qw8CgYAkJKwIaCicBeCP2o3a4UPAvKxH39+98ZSAjNMIhmSo3/KSNNzDhJTt\n6Tk5l7WAIa6hJVbVxcNwktCHBzBIEJXZDsLF2t8Kr2T4YjVwztTu8TvBmDKrC7OH\n65IFhdUtplWteCMNnRHXiX20LnZ2xKlDvv0yVidldO9BayA3nbsShA==\n-----END RSA PRIVATE KEY-----\n"
+      #     #   http2: off # on off
+      #     #   forceHttps: on # on off default
+      #     access:
+      #       referer:
+      #         refererType: blacklist
+      #         allowEmpty: true 
+      #         referers: 
+      #           - 'aliyun.com'
+      #           - 'taobao.com'

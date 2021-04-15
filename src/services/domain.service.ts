@@ -1,4 +1,4 @@
-import { loadComponent } from '@serverless-devs/core';
+import { loadComponent, Logger, modifyProps } from '@serverless-devs/core';
 import cloneDeep from 'lodash.clonedeep';
 import CdnService from './cdnclient.service';
 import DnsService from './dnsclient.service';
@@ -38,12 +38,20 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
 const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
   const { credentials, inputs, sources } = params;
   const { props } = inputs;
-  const domainConponent = await loadComponent('domain');
+  const domainConponent = await loadComponent(
+    'devsapp/domain',
+    'http://registry.serverlessfans.cn/simple',
+  );
   const cdnClient = CdnService.createClient(credentials);
   // eslint-disable-next-line
   inputs.props = { ...props, type: 'oss' };
 
   const sysDomain = await domainConponent.get(inputs);
+  await modifyProps('website', {
+    hosts: props.hosts.map((item) => {
+      return item.host === 'auto' ? { ...item, host: sysDomain } : item;
+    }),
+  });
 
   CdnService.modifyCdnDomain(cdnClient, { domain: sysDomain, sources });
 
@@ -100,13 +108,17 @@ export default async (orinalInputs) => {
     accessKeySecret: get(inputs, 'Credentials.AccessKeySecret'),
   };
   const { hosts } = props;
-  if (hosts) {
+  if (hosts?.length > 0) {
     await Promise.all(
       hosts.map(async (hostObj) => {
-        await generateDomain({ credentials, hostObj, sources });
+        if (hostObj.host === 'auto') {
+          await generateSystemDomain({ credentials, inputs, sources });
+        } else {
+          await generateDomain({ credentials, hostObj, sources });
+        }
       }),
     );
   } else {
-    await generateSystemDomain({ credentials, inputs, sources });
+    Logger.log('如果需要系统帮你生成一个域名，可配置host为 auto ', 'blue');
   }
 };
