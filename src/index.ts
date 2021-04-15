@@ -1,4 +1,4 @@
-import { HLogger, ILogger, getCredential, spinner } from '@serverless-devs/core';
+import { HLogger, ILogger, spinner, reportComponent } from '@serverless-devs/core';
 import get from 'lodash.get';
 import domain from './services/domain.service';
 import env from './services/env.servece';
@@ -12,12 +12,17 @@ export default class WebsiteComponent {
    * @param inputs
    */
   async deploy(inputs: any) {
-    const { projectName, access } = inputs.project;
-    this.logger.debug(`[${projectName}] inputs params: ${JSON.stringify(inputs, null, 2)}`);
-    const { AccessKeyID, AccessKeySecret } = await getCredential(access);
+    const credentials = get(inputs, 'credentials') || {};
+    reportComponent('website', {
+      uid: credentials.AccountID,
+      command: 'deploy',
+    });
+    this.logger.debug(
+      `[${get(inputs, 'project.projectName')}] inputs params: ${JSON.stringify(inputs, null, 2)}`,
+    );
     const ossConfig: IOssConfig = {
-      accessKeyId: get(inputs, 'Credentials.AccessKeyID', AccessKeyID),
-      accessKeySecret: get(inputs, 'Credentials.AccessKeySecret', AccessKeySecret),
+      accessKeyId: credentials.AccessKeyID,
+      accessKeySecret: credentials.AccessKeySecret,
       bucket: get(inputs, 'props.bucket'),
       region: get(inputs, 'props.region'),
       src: get(inputs, 'props.src', DEFAULT_SRC),
