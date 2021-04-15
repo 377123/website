@@ -1,5 +1,5 @@
 import Cdn20180510 from '@alicloud/cdn20180510';
-import { ICredentials, ICdnSource, IReferer, IHttps, TForceHttps, THttp2, IIpFilter } from '../interface';
+import { ICredentials, ICdnSource, IReferer, IHttps, TForceHttps, THttp2, IIpFilter, IOptimization } from '../interface';
 export default class Client {
     /**
      * 使用AK&SK初始化账号Client
@@ -128,4 +128,13 @@ export default class Client {
         domain: string;
         uaFilter: IIpFilter;
     }): Promise<any>;
+    /**
+     * @description 性能优化
+     * @param client
+     * @param param1
+     */
+    static setCdnDomainOptimization(client: any, { domain, optimization }: {
+        domain: string;
+        optimization: IOptimization;
+    }): Promise<void>;
 }

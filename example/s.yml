@@ -51,4 +51,10 @@ services:
               rules:
                 - 'IE'
                 - '*chrome*'
-
+          optimization:
+            trim:
+              html: off
+              css: on
+              javascript: off
+            gzip: off
+            brotli: off

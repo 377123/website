@@ -22,7 +22,7 @@ const getCdnOssSources = (region: string, bucket: string): ICdnSource => {
 };
 
 const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
-  const { access, https } = hostObj;
+  const { access, https, optimization } = hostObj;
   // https 配置
   if (https) {
     await CdnService.setDomainServerCertificate(cdnClient, { domain, https });
@@ -43,6 +43,11 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
   const uaFilter = get(access, 'uaFilter');
   if (uaFilter) {
     await CdnService.setCdnDomainUaFilter(cdnClient, { domain, uaFilter });
+  }
+
+  // 性能优化
+  if (optimization) {
+    await CdnService.setCdnDomainOptimization(cdnClient, { domain, optimization });
   }
 };
 

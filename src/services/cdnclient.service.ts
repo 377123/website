@@ -12,8 +12,15 @@ import {
   ForceHttpsEnum,
   RefererEnum,
   IpFilterEnum,
+  IOptimization,
 } from '../interface';
-import { parseReferer, parseCertInfo, parseIpFilter, parseUaFilter } from '../utils';
+import {
+  parseReferer,
+  parseCertInfo,
+  parseIpFilter,
+  parseUaFilter,
+  parseOptimization,
+} from '../utils';
 import { CDN_ERRORS } from '../contants';
 import get from 'lodash.get';
 
@@ -438,6 +445,22 @@ export default class Client {
     const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
       domainNames: domain,
       functions: JSON.stringify([parseUaFilter(uaFilter)]),
+    });
+    await client.batchSetCdnDomainConfig(cdnDomainStagingConfigRequest);
+  }
+
+  /**
+   * @description 性能优化
+   * @param client
+   * @param param1
+   */
+  static async setCdnDomainOptimization(
+    client,
+    { domain, optimization }: { domain: string; optimization: IOptimization },
+  ) {
+    const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
+      domainNames: domain,
+      functions: JSON.stringify(parseOptimization(optimization)),
     });
     await client.batchSetCdnDomainConfig(cdnDomainStagingConfigRequest);
   }

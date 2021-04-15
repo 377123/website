@@ -1,4 +1,13 @@
-import { IDomain, IReferer, ICertInfo, IIpFilter, RefererEnum, IpFilterEnum } from './interface';
+import {
+  IDomain,
+  IReferer,
+  ICertInfo,
+  IIpFilter,
+  RefererEnum,
+  IpFilterEnum,
+  IOptimization,
+} from './interface';
+import get from 'lodash.get';
 
 export const parseDomain = (domain: string): IDomain => {
   const arr = domain.split('.');
@@ -126,6 +135,30 @@ export function parseCertInfo(params: ICertInfo) {
     certType: 'free',
     serverCertificateStatus: 'on',
   };
+}
+
+export function parseOptimization(params: IOptimization) {
+  return [
+    {
+      functionName: 'tesla',
+      functionArgs: [
+        { argName: 'enable', argValue: get(params, 'trim.html', 'off') },
+        { argName: 'trim_css', argValue: get(params, 'trim.css', 'off') },
+        { argName: 'trim_js', argValue: get(params, 'trim.javascript', 'off') },
+      ],
+    },
+    {
+      functionName: 'gzip',
+      functionArgs: [{ argName: 'enable', argValue: get(params, 'gzip', 'off') }],
+    },
+    {
+      functionName: 'brotli',
+      functionArgs: [
+        { argName: 'enable', argValue: get(params, 'brotli', 'off') },
+        { argName: 'brotli_level', argValue: '1' },
+      ],
+    },
+  ];
 }
 
 // TODO: 专门针对publish.yaml来处理default字段。不需要每次都都手动处理

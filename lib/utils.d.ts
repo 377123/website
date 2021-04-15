@@ -1,4 +1,4 @@
-import { IDomain, IReferer, ICertInfo, IIpFilter, RefererEnum, IpFilterEnum } from './interface';
+import { IDomain, IReferer, ICertInfo, IIpFilter, RefererEnum, IpFilterEnum, IOptimization } from './interface';
 export declare const parseDomain: (domain: string) => IDomain;
 export declare function sleep(msec: any): Promise<unknown>;
 export declare function parseReferer(params: IReferer): {
@@ -41,3 +41,10 @@ export declare function parseCertInfo(params: ICertInfo): {
     serverCertificate?: undefined;
     privateKey?: undefined;
 };
+export declare function parseOptimization(params: IOptimization): {
+    functionName: string;
+    functionArgs: {
+        argName: string;
+        argValue: any;
+    }[];
+}[];

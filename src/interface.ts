@@ -63,3 +63,13 @@ export enum IpFilterEnum {
   whitelist = 'ip_allow_list_set',
   blacklist = 'ip_black_list_set',
 }
+
+export interface IOptimization {
+  trim: {
+    html: 'on' | 'off';
+    css: 'on' | 'off';
+    javascript: 'on' | 'off';
+  };
+  gzip: 'on' | 'off';
+  brotli: 'on' | 'off';
+}
