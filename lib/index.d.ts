@@ -5,6 +5,6 @@ export default class WebsiteComponent {
      * 部署
      * @param inputs
      */
-    deploy(inputs: any): any;
-    remove(inputs: any): any;
+    deploy(inputs: any): Promise<void>;
+    remove(inputs: any): Promise<void>;
 }

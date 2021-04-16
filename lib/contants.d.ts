@@ -1,6 +1,10 @@
-export declare const PUT_BUCKET_CORS: {};
+export declare const PUT_BUCKET_CORS: {
+    allowedOrigin: string;
+    allowedHeader: string;
+    allowedMethod: string[];
+}[];
 export declare const DEFAULT_SRC: {
-    src: string;
+    codeUri: string;
     index: string;
     error: string;
 };

@@ -6,12 +6,14 @@ services:
     props:
       bucket: shl-website-test01
       src:
-        src: ./src
-        dist: ./build
-        hook: npm run build
+        codeUri: ./
+        publishDir: ./build
+        buildCommand: npm run build
         index: index.html
         error: index.html
       region: cn-hangzhou
+      env: 
+        baseUrl: www.shihuali.top
       cors:
         - allowedOrigin: '*'
           allowedMethod:

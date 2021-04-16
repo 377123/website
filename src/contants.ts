@@ -7,7 +7,7 @@ export const PUT_BUCKET_CORS = [
 ];
 
 export const DEFAULT_SRC = {
-  src: './',
+  codeUri: './',
   index: 'index.html',
   error: 'error.html',
 };

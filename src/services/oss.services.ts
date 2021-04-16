@@ -7,11 +7,11 @@ import walkSync from 'walk-sync';
 import { spawnSync } from 'child_process';
 
 interface ISrc {
-  src: string;
-  dist?: string;
-  hook?: string;
-  index: string;
-  error: string;
+  publishDir: string;
+  codeUri?: string;
+  buildCommand?: string;
+  index?: string;
+  error?: string;
 }
 export interface IOssConfig {
   accessKeyId: string;
@@ -24,8 +24,8 @@ export interface IOssConfig {
 
 export default async (ossConfig: IOssConfig) => {
   const { bucket, region, accessKeyId, accessKeySecret, src, cors } = ossConfig;
-  if (src.hook) {
-    await buildSpawnSync(src.hook, src.src);
+  if (src.buildCommand) {
+    await buildSpawnSync(src.buildCommand, src.codeUri);
   }
   // 构造oss客户端
   let ossClient = new OssClient({
@@ -46,7 +46,7 @@ export default async (ossConfig: IOssConfig) => {
     accessKeySecret,
   });
   // 文件上传
-  await put(ossClient, src.dist || src.src);
+  await put(ossClient, src.publishDir);
 
   // 配置静态托管
   await ossClient.putBucketWebsite(bucket, { index: src.index, error: src.error });
