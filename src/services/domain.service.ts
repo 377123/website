@@ -64,11 +64,15 @@ const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
   inputs.props = { ...props, type: 'oss' };
 
   const sysDomain = await domainConponent.get(inputs);
-  await modifyProps('website', {
-    hosts: props.hosts.map((item) => {
-      return item.host === 'auto' ? { ...item, host: sysDomain } : item;
-    }),
-  });
+  await modifyProps(
+    get(inputs, 'project.projectName'),
+    {
+      hosts: props.hosts.map((item) => {
+        return item.host === 'auto' ? { ...item, host: sysDomain } : item;
+      }),
+    },
+    get(inputs, 'path.configPath'),
+  );
 
   CdnService.modifyCdnDomain(cdnClient, { domain: sysDomain, sources });
 
