@@ -6,5 +6,6 @@ export default class WebsiteComponent {
      * @param inputs
      */
     deploy(inputs: any): Promise<void>;
+    deployFunction(inputs: any): Promise<void>;
     remove(inputs: any): Promise<void>;
 }

@@ -4,6 +4,7 @@ import domain from './services/domain.service';
 import env from './services/env.servece';
 import oss, { IOssConfig } from './services/oss.services';
 import { DEFAULT_SRC } from './contants';
+import { generateFcSpec } from './services/functions.service';
 
 export default class WebsiteComponent {
   @HLogger('WEBSITE') logger: ILogger;
@@ -35,6 +36,9 @@ export default class WebsiteComponent {
     await domain(inputs);
   }
 
+  async deployFunction(inputs: any) {
+    await generateFcSpec(inputs);
+  }
   async remove(inputs: any) {
     // 删除所有用到的资源以及配置等
     console.log(inputs);
