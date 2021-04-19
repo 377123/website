@@ -23,6 +23,7 @@ import {
 } from '../utils';
 import { CDN_ERRORS } from '../contants';
 import get from 'lodash.get';
+import { Logger } from '@serverless-devs/core';
 
 export default class Client {
   /**
@@ -234,7 +235,12 @@ export default class Client {
       domain,
       forceHttps: get(https, 'protocol', 'https'),
     });
-    await Client.setCdnDomainHttp2(client, { domain, http2: get(https, 'http2', 'off') });
+    if (get(https, 'certInfo.switch') === 'off' && https.http2 === 'on') {
+      Logger.log('HTTP/2是最新的HTTP协议，开启前您需要先配置HTTPS证书', 'red');
+    }
+    if (get(https, 'certInfo.switch') === 'on') {
+      await Client.setCdnDomainHttp2(client, { domain, http2: get(https, 'http2', 'off') });
+    }
   }
 
   static async setCdnDomainHttp2(

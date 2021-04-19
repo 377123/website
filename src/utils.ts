@@ -133,7 +133,7 @@ export function parseCertInfo(params: ICertInfo) {
   }
   return {
     certType: 'free',
-    serverCertificateStatus: 'on',
+    serverCertificateStatus: params.switch,
   };
 }
 

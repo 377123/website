@@ -24,9 +24,7 @@ const getCdnOssSources = (region: string, bucket: string): ICdnSource => {
 const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
   const { access, https, optimization } = hostObj;
   // https 配置
-  if (https) {
-    await CdnService.setDomainServerCertificate(cdnClient, { domain, https });
-  }
+  await CdnService.setDomainServerCertificate(cdnClient, { domain, https });
   // Referer 防盗链
   const referer = get(access, 'referer');
   if (referer) {

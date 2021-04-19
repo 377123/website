@@ -36,7 +36,7 @@ export declare function parseCertInfo(params: ICertInfo): {
     privateKey?: undefined;
 } | {
     certType: string;
-    serverCertificateStatus: string;
+    serverCertificateStatus: "on" | "off";
     certName?: undefined;
     serverCertificate?: undefined;
     privateKey?: undefined;
