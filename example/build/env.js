@@ -1,3 +1,3 @@
 window.env = {
-  "baseUrl": "dankun1.alijam.top"
+  "baseUrl": "www.shihuali.top"
 };

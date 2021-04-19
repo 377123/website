@@ -23,7 +23,7 @@ export interface ICertInfo {
     serverCertificate?: string;
     privateKey?: string;
 }
-export declare type TForceHttps = 'on' | 'off' | 'default';
+export declare type TForceHttps = 'http' | 'https' | 'default';
 export declare type THttp2 = 'on' | 'off';
 export interface IHttps {
     certInfo: ICertInfo;
@@ -42,8 +42,8 @@ export interface IIpFilter {
     rules: string[];
 }
 export declare enum ForceHttpsEnum {
-    off = "http_force",
-    on = "https_force"
+    http = "http_force",
+    https = "https_force"
 }
 export declare enum RefererEnum {
     whitelist = "referer_white_list_set",

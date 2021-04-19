@@ -41,7 +41,7 @@ services:
               serverCertificate: 'your serverCertificate' # certType为upload，需要传递该参数
               privateKey: 'your privateKey' # certType为upload，需要传递该参数
             http2: off # on off
-            forceHttps: off # on off default
+            protocol: https # on off default
           access:
             referer:
               switch: off
@@ -121,11 +121,11 @@ CDN 配置
 
 ##### Https
 
-| 参数名称   | 必选 | 类型                       | 默认             | 描述                                                 |
-| ---------- | :--: | :------------------------- | ---------------- | ---------------------------------------------------- |
-| certInfo   |  否  | [CertInfo](#CertInfo)      | 默认使用免费证书 | HTTPS 证书                                           |
-| http2      |  否  | 'on' \| 'off'              | 'off'            | HTTP/2 是最新的 HTTP 协议，提高了资源访问效率。      |
-| forceHttps |  否  | 'on' \| 'off' \| 'default' | 'on'             | 选择“default”时，同时支持 HTTP 和 HTTPS 方式的请求。 |
+| 参数名称 | 必选 | 类型                           | 默认             | 描述                                                 |
+| -------- | :--: | :----------------------------- | ---------------- | ---------------------------------------------------- |
+| certInfo |  否  | [CertInfo](#CertInfo)          | 默认使用免费证书 | HTTPS 证书                                           |
+| http2    |  否  | 'on' \| 'off'                  | 'off'            | HTTP/2 是最新的 HTTP 协议，提高了资源访问效率。      |
+| protocol |  否  | 'http' \| 'https' \| 'default' | 'https'          | 选择“default”时，同时支持 HTTP 和 HTTPS 方式的请求。 |
 
 ###### CertInfo
 

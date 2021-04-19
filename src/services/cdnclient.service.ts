@@ -232,7 +232,7 @@ export default class Client {
     await client.setDomainServerCertificate(domainServerCertificateRequest);
     await Client.setCdnDomainForceHttps(client, {
       domain,
-      forceHttps: get(https, 'forceHttps', 'on'),
+      forceHttps: get(https, 'protocol', 'https'),
     });
     await Client.setCdnDomainHttp2(client, { domain, http2: get(https, 'http2', 'off') });
   }
@@ -297,10 +297,11 @@ export default class Client {
   ): Promise<void> {
     const cdnDomainConfigs = await Client.DescribeCdnDomainConfigs(client, {
       domain,
-      functionNames: `${ForceHttpsEnum.off},${ForceHttpsEnum.on}`,
+      functionNames: `${ForceHttpsEnum.http},${ForceHttpsEnum.https}`,
     });
     const forceHttpsOptioned = cdnDomainConfigs.find(
-      (item) => item.functionName === ForceHttpsEnum.off || item.functionName === ForceHttpsEnum.on,
+      (item) =>
+        item.functionName === ForceHttpsEnum.http || item.functionName === ForceHttpsEnum.https,
     );
     // 存在则设置过
     if (forceHttpsOptioned) {

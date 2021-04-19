@@ -79,9 +79,9 @@ services:
     props:
       bucket: my-bucket
       src:
-        src: './src'
-        dist: './build'
-        hook: npm run build
+        codeUri: './src'
+        publishDir: './build'
+        buildCommand: npm run build
         index: index.html
         error: index.html
       region: cn-hangzhou
