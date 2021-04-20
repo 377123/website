@@ -24,19 +24,19 @@ export declare function parseUaFilter(params: IIpFilter): {
 };
 export declare function parseCertInfo(params: ICertInfo): {
     certType: "upload";
-    serverCertificateStatus: "on" | "off";
+    serverCertificateStatus: any;
     certName: string;
     serverCertificate: string;
     privateKey: string;
 } | {
     certType: "csr";
-    serverCertificateStatus: "on" | "off";
+    serverCertificateStatus: any;
     serverCertificate: string;
     certName?: undefined;
     privateKey?: undefined;
 } | {
     certType: string;
-    serverCertificateStatus: "on" | "off";
+    serverCertificateStatus: any;
     certName?: undefined;
     serverCertificate?: undefined;
     privateKey?: undefined;

@@ -51,7 +51,7 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
 
 // 生成系统域名
 const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
-  const { credentials, inputs, sources } = params;
+  const { credentials, inputs } = params;
   const { props } = inputs;
   const domainConponent = await loadComponent(
     'devsapp/domain',

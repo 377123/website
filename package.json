@@ -33,7 +33,7 @@
   },
   "scripts": {
     "dev": "npx tsc -w -p tsconfig.json",
-    "prebuild": "rimraf dist",
+    "prebuild": "rimraf lib",
     "build": "npx tsc -p tsconfig.json",
     "test": "jest",
     "test:cov": "jest --coverage",

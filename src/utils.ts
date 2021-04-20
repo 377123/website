@@ -110,14 +110,14 @@ export function parseCertInfo(params: ICertInfo) {
   if (params.certType === 'free') {
     return {
       certType: params.certType,
-      serverCertificateStatus: params.switch,
+      serverCertificateStatus: get(params, 'switch', 'on'),
     };
   }
 
   if (params.certType === 'upload') {
     return {
       certType: params.certType,
-      serverCertificateStatus: params.switch,
+      serverCertificateStatus: get(params, 'switch', 'on'),
       certName: params.certName,
       serverCertificate: params.serverCertificate,
       privateKey: params.privateKey,
@@ -127,13 +127,13 @@ export function parseCertInfo(params: ICertInfo) {
   if (params.certType === 'csr') {
     return {
       certType: params.certType,
-      serverCertificateStatus: params.switch,
+      serverCertificateStatus: get(params, 'switch', 'on'),
       serverCertificate: params.serverCertificate,
     };
   }
   return {
     certType: 'free',
-    serverCertificateStatus: params.switch,
+    serverCertificateStatus: get(params, 'switch', 'on'),
   };
 }
 
