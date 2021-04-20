@@ -72,8 +72,6 @@ const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
     get(inputs, 'path.configPath'),
   );
 
-  CdnService.modifyCdnDomain(cdnClient, { domain: sysDomain, sources });
-
   await CdnService.setDomainServerCertificate(cdnClient, { domain: sysDomain });
 };
 
