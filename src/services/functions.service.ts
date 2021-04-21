@@ -74,22 +74,13 @@ export const generateFcSpec = async (inputs) => {
               function: generateFunction(codeUri, name.replace('.js', '')),
               triggers: generateHttpTriggers(),
             };
-            const fcDeploy = await loadComponent('fc-deploy');
+            const fcDeploy = await loadComponent('devsapp/fc-deploy');
             delete inputs.props;
-            console.log(
-              JSON.stringify(
-                {
-                  props: fcDeployFuncion,
-                  ...inputs,
-                },
-                null,
-                2,
-              ),
-            );
-            fcDeploy.deploy({
+            const result = await fcDeploy.deploy({
               props: fcDeployFuncion,
               ...inputs,
             });
+            return [name, result];
           }),
       );
     }

@@ -37,10 +37,11 @@ export default class WebsiteComponent {
   }
 
   async deployFunction(inputs: any) {
-    await generateFcSpec(inputs);
+    const result = await generateFcSpec(inputs);
+    console.log(3434, JSON.stringify(result));
   }
   async remove(inputs: any) {
     // 删除所有用到的资源以及配置等
-    console.log(inputs);
+    console.log(JSON.stringify(inputs));
   }
 }

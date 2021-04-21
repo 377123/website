@@ -1,1 +1,1 @@
-export declare const generateFcSpec: (inputs: any) => Promise<void[]>;
+export declare const generateFcSpec: (inputs: any) => Promise<any[][]>;
