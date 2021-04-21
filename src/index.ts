@@ -38,7 +38,7 @@ export default class WebsiteComponent {
 
   async deployFunction(inputs: any) {
     const result = await generateFcSpec(inputs);
-    console.log(3434, JSON.stringify(result));
+    console.log(JSON.stringify(result));
   }
   async remove(inputs: any) {
     // 删除所有用到的资源以及配置等

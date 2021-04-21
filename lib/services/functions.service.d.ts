@@ -1,1 +1,4 @@
-export declare const generateFcSpec: (inputs: any) => Promise<any[][]>;
+export declare const generateFcSpec: (inputs: any) => Promise<{
+    name: string;
+    httpUrl: string;
+}[]>;

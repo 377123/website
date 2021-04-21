@@ -54,6 +54,8 @@ const generateHttpTriggers = (config?: any) => {
 };
 
 export const generateFcSpec = async (inputs) => {
+  const accountID = get(inputs, 'Credentials.AccountID');
+  const props = get(inputs, 'props', {});
   const { service, codeUri, functions } = get(inputs, 'props.faas', {});
   if (!functions) {
     const functionDir = path.join(process.cwd(), codeUri);
@@ -67,7 +69,7 @@ export const generateFcSpec = async (inputs) => {
         functionPaths
           .filter((functionName) => functionName.indexOf('.js') > -1)
           .map(async (name) => {
-            const { region } = inputs.props;
+            const { region } = props;
             const fcDeployFuncion = {
               region,
               service: generateService(service),
@@ -80,7 +82,9 @@ export const generateFcSpec = async (inputs) => {
               props: fcDeployFuncion,
               ...inputs,
             });
-            return [name, result];
+            const { region: curRegion, function: funcName } = result;
+            const httpUrl = `${accountID}.${curRegion}.fc.aliyuncs.com/<version>/proxy/${service.name}/${funcName.name}/`;
+            return { name, httpUrl };
           }),
       );
     }
