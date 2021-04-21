@@ -487,9 +487,10 @@ export default class Client {
       domain,
       functionNames: `host_redirect`,
     });
-    cdnDomainConfigs.map(async (item) => {
-      await Client.DeleteSpecificConfig(client, { domain, configId: item.configId });
-    });
+    const configIds = cdnDomainConfigs.map((item) => item.configId);
+    if (configIds.length > 0) {
+      await Client.DeleteSpecificConfig(client, { domain, configId: configIds.join(',') });
+    }
     const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
       domainNames: domain,
       functions: JSON.stringify(parseRedirects(redirects)),
