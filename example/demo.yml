@@ -1,10 +1,10 @@
 redirect:
-	- source: ^/hello
-	  target: https://www.baidu.com
-	  type: redirect
-	- source: ^/dankun
-	  target: https://www.baidu.com
-	  type: redirect
+	- switch: on
+		source: ^/hello
+	  destination: https://www.baidu.com
+	- switch: on
+		source: ^/dankun
+	  destination: https://www.baidu.com
 
 
 https:

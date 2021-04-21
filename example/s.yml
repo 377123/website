@@ -1,10 +1,10 @@
 edition: 1.0.0
 services:
   website:
-    component: /Users/yk/heimanba/aliFE/devsapp/website/lib/index.js
-    access: simple_mvc
+    component: /Users/shihuali/workspace/website/lib/index.js
+    access: my
     props:
-      bucket: dankun-website-1
+      bucket: shl-website-vuepress-01
       src:
         codeUri: ./
         publishDir: ./build
@@ -13,12 +13,11 @@ services:
         error: index.html
       region: cn-hangzhou
       hosts:
-        - host: dankun-website-1.oss.devsapp.cn
-      faas:
-        service: dankun-midway-app
-        codeUri: ./functions
-        memorySize: 128
-        timeout: 60
-        initializationTimeout: 60
-        instanceConcurrency: 1
-        instanceType: e1
+        - host: shl-website-vuepress-01.oss.devsapp.cn
+          redirects:
+            - switch: on
+              source: /intro/
+              destination: /basic-config/
+            - switch: off
+              source: /basic-config/
+              destination: /a

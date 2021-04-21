@@ -6,6 +6,7 @@ import {
   RefererEnum,
   IpFilterEnum,
   IOptimization,
+  IRedirects,
 } from './interface';
 import get from 'lodash.get';
 
@@ -159,6 +160,27 @@ export function parseOptimization(params: IOptimization) {
       ],
     },
   ];
+}
+
+export function parseRedirects(params: IRedirects[]) {
+  const option = params.filter((item) => get(item, 'switch', 'on') === 'on');
+  return option.map((item) => ({
+    functionName: 'host_redirect',
+    functionArgs: [
+      {
+        argName: 'regex',
+        argValue: item.source,
+      },
+      {
+        argName: 'replacement',
+        argValue: item.destination,
+      },
+      {
+        argName: 'flag',
+        argValue: 'redirect',
+      },
+    ],
+  }));
 }
 
 // TODO: 专门针对publish.yaml来处理default字段。不需要每次都都手动处理
