@@ -1,4 +1,4 @@
-import { loadComponent, Logger, modifyProps } from '@serverless-devs/core';
+import { loadComponent, Logger } from '@serverless-devs/core';
 import cloneDeep from 'lodash.clonedeep';
 import CdnService from './cdnclient.service';
 import DnsService from './dnsclient.service';
@@ -69,15 +69,6 @@ const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
 
   const sysDomain = await domainConponent.get(inputs);
   Logger.debug(LOGCONTEXT, `系统域名:${sysDomain}`);
-  await modifyProps(
-    get(inputs, 'project.projectName'),
-    {
-      hosts: props.hosts.map((item) => {
-        return item.host === 'auto' ? { ...item, host: sysDomain } : item;
-      }),
-    },
-    get(inputs, 'path.configPath'),
-  );
 
   /**
    * 修改证书前，看cname是否生效
