@@ -13,6 +13,7 @@ import {
   RefererEnum,
   IpFilterEnum,
   IOptimization,
+  IRedirects,
 } from '../interface';
 import {
   parseReferer,
@@ -20,6 +21,7 @@ import {
   parseIpFilter,
   parseUaFilter,
   parseOptimization,
+  parseRedirects,
 } from '../utils';
 import { CDN_ERRORS } from '../contants';
 import get from 'lodash.get';
@@ -468,6 +470,30 @@ export default class Client {
     const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
       domainNames: domain,
       functions: JSON.stringify(parseOptimization(optimization)),
+    });
+    await client.batchSetCdnDomainConfig(cdnDomainStagingConfigRequest);
+  }
+
+  /**
+   * @description 重定向
+   * @param client
+   * @param param1
+   */
+  static async setCdnDomainRedirects(
+    client,
+    { domain, redirects }: { domain: string; redirects: IRedirects[] },
+  ) {
+    const cdnDomainConfigs = await Client.DescribeCdnDomainConfigs(client, {
+      domain,
+      functionNames: `host_redirect`,
+    });
+    const configIds = cdnDomainConfigs.map((item) => item.configId);
+    if (configIds.length > 0) {
+      await Client.DeleteSpecificConfig(client, { domain, configId: configIds.join(',') });
+    }
+    const cdnDomainStagingConfigRequest = new $Cdn20180510.BatchSetCdnDomainConfigRequest({
+      domainNames: domain,
+      functions: JSON.stringify(parseRedirects(redirects)),
     });
     await client.batchSetCdnDomainConfig(cdnDomainStagingConfigRequest);
   }

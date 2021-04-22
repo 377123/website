@@ -62,3 +62,8 @@ export interface IOptimization {
     gzip: 'on' | 'off';
     brotli: 'on' | 'off';
 }
+export interface IRedirects {
+    switch: 'on' | 'off';
+    source: string;
+    destination: string;
+}

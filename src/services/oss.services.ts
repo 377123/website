@@ -77,7 +77,7 @@ async function put(ossClient: OssClient, staticPath: string) {
       const spin = spinner(`上传 ${p}`);
       try {
         await ossClient.put(p, fillPath);
-        spin.succeed();
+        spin.stop();
       } catch (error) {
         spin.fail();
         throw new Error(error.message);
