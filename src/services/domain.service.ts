@@ -1,13 +1,14 @@
-import { loadComponent, Logger } from '@serverless-devs/core';
+import { loadComponent, Logger, spinner } from '@serverless-devs/core';
 import cloneDeep from 'lodash.clonedeep';
 import CdnService from './cdnclient.service';
 import DnsService from './dnsclient.service';
 import { ICdnSource, IDomainParams } from '../interface';
-import { parseDomain, waitUntil } from '../utils';
+import { parseDomain, sleep } from '../utils';
 import get from 'lodash.get';
+import chillout from 'chillout';
 
 const LOGCONTEXT = 'WEBSITE';
-const FIVE_MINUTE = 60 * 60 * 5;
+const TEN_MINUTE = 10 * 60 * 1000;
 /**
  * OSS 源站
  * @param region
@@ -71,13 +72,25 @@ const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
   Logger.debug(LOGCONTEXT, `系统域名:${sysDomain}`);
 
   /**
-   * 修改证书前，看cname是否生效
+   * 修改证书前，查看域名是否配置成功
    */
-  await waitUntil({
-    asyncService: CdnService.describeCdnDomainDetail(cdnClient, sysDomain),
-    stopCondition: (result) => !!result.cname,
-    timeout: FIVE_MINUTE,
-    desc: '系统域名生效',
+  const startTime = new Date().getTime();
+  const spin = spinner('系统域名配置中...');
+  await chillout.waitUntil(async () => {
+    await sleep(3000);
+    const result = await CdnService.DescribeUserDomains(cdnClient, {
+      domain: sysDomain,
+      checkDomainShow: true,
+    });
+    if (new Date().getTime() - startTime > TEN_MINUTE) {
+      Logger.debug('WEBSITE', '等待系统域名生效超时');
+      spin.fail('系统域名配置失败');
+      return chillout.StopIteration;
+    }
+    if (get(result, 'domainStatus') === 'online') {
+      spin.succeed('系统域名配置成功');
+      return chillout.StopIteration;
+    }
   });
 
   await CdnService.setDomainServerCertificate(cdnClient, { domain: sysDomain });
@@ -101,10 +114,18 @@ const generateDomain = async (params: IDomainParams) => {
       domain,
       sources,
     });
-    await waitUntil({
-      asyncService: CdnService.describeCdnDomainDetail(cdnClient, domain),
-      stopCondition: (result) => !!result.cname,
-      desc: 'DNS 首次配置生效',
+
+    const startTime = new Date().getTime();
+    await chillout.waitUntil(async () => {
+      await sleep(3000);
+      const result = await CdnService.describeCdnDomainDetail(cdnClient, domain);
+      if (new Date().getTime() - startTime > TEN_MINUTE) {
+        Logger.debug('WEBSITE', '等待 DNS 首次配置生效超时');
+        return chillout.StopIteration;
+      }
+      if (!!get(result, 'cname')) {
+        return chillout.StopIteration;
+      }
     });
 
     await DnsService.addDomainRecord(dnsClient, {

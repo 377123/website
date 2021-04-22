@@ -295,6 +295,23 @@ export default class Client {
   }
 
   /**
+   * @description 获取用户的加速域名信息
+   * @param client
+   * @param param1
+   */
+  static async DescribeUserDomains(
+    client,
+    { domain, checkDomainShow }: { domain: string; checkDomainShow: boolean },
+  ): Promise<any> {
+    const option = new $Cdn20180510.DescribeUserDomainsRequest({
+      domainName: domain,
+      checkDomainShow,
+    });
+    const result = await client.describeUserDomains(option);
+    return get(result, 'body.domains.pageData[0]');
+  }
+
+  /**
    * @description 强制HTTPS跳转
    * @param client
    * @param param1

@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 import { IDomain, IReferer, ICertInfo, IIpFilter, RefererEnum, IpFilterEnum, IOptimization, IRedirects } from './interface';
 export declare const parseDomain: (domain: string) => IDomain;
 export declare function sleep(msec: any): Promise<unknown>;
@@ -55,10 +56,13 @@ export declare function parseRedirects(params: IRedirects[]): {
         argValue: string;
     }[];
 }[];
-export declare const waitUntil: ({ asyncService, stopCondition, timeout, timeInterval, desc, }: {
-    asyncService: Promise<any>;
-    stopCondition: (result: any) => boolean;
+export declare const waitUntil: (asyncService: Promise<any>, stopCondition: (result: any) => boolean, { timeout, timeInterval, timeoutMsg, hint, }: {
     timeInterval?: number;
     timeout?: number;
-    desc: string;
+    timeoutMsg: string;
+    hint?: {
+        loading: string;
+        success: string;
+        fail: string;
+    };
 }) => Promise<void>;

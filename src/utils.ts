@@ -10,7 +10,7 @@ import {
 } from './interface';
 import get from 'lodash.get';
 import chillout from 'chillout';
-import { Logger } from '@serverless-devs/core';
+import { Logger, spinner } from '@serverless-devs/core';
 
 export const parseDomain = (domain: string): IDomain => {
   const arr = domain.split('.');
@@ -187,35 +187,40 @@ export function parseRedirects(params: IRedirects[]) {
 
 // TODO: 专门针对publish.yaml来处理default字段。不需要每次都都手动处理
 
-export const waitUntil = async ({
-  asyncService,
-  stopCondition,
-  timeout = 60 * 60 * 10, //10分超时时间
-  timeInterval = 350,
-  desc,
-}: {
-  asyncService: Promise<any>;
-  stopCondition: (result: any) => boolean;
-  timeInterval?: number;
-  timeout?: number;
-  desc: string;
-}) => {
+// TODO: waitUntil方法有问题，待排查
+export const waitUntil = async (
+  asyncService: Promise<any>,
+  stopCondition: (result: any) => boolean,
+  {
+    timeout = 15 * 60 * 1000, //15分超时时间
+    timeInterval = 1000,
+    timeoutMsg,
+    hint,
+  }: {
+    timeInterval?: number;
+    timeout?: number;
+    timeoutMsg: string;
+    hint?: {
+      loading: string;
+      success: string;
+      fail: string;
+    };
+  },
+) => {
   let count = 0;
+  const spin = spinner(hint.loading);
   await chillout.waitUntil(async () => {
-    let isStop = false;
-    while (!isStop) {
-      count += timeInterval;
-      if (count >= timeout) {
-        Logger.debug('WEBSITE', `${desc} 等待超时`);
-        isStop = true;
-      }
-      await sleep(timeInterval);
-      // eslint-disable-next-line
-      const result = await asyncService;
-      if (stopCondition(result)) {
-        isStop = true;
-      }
+    count += timeInterval;
+    if (count >= timeout) {
+      Logger.debug('WEBSITE', timeoutMsg);
+      spin.fail(hint.fail);
+      return chillout.StopIteration;
     }
-    return chillout.StopIteration;
+    await sleep(timeInterval);
+    const result = await asyncService;
+    if (stopCondition(result)) {
+      spin.succeed(hint.success);
+      return chillout.StopIteration;
+    }
   });
 };

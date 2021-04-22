@@ -93,6 +93,15 @@ export default class Client {
         functionNames: string;
     }): Promise<any>;
     /**
+     * @description 获取用户的加速域名信息
+     * @param client
+     * @param param1
+     */
+    static DescribeUserDomains(client: any, { domain, checkDomainShow }: {
+        domain: string;
+        checkDomainShow: boolean;
+    }): Promise<any>;
+    /**
      * @description 强制HTTPS跳转
      * @param client
      * @param param1
