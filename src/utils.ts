@@ -8,6 +8,8 @@ import {
   IOptimization,
 } from './interface';
 import get from 'lodash.get';
+import chillout from 'chillout';
+import { Logger } from '@serverless-devs/core';
 
 export const parseDomain = (domain: string): IDomain => {
   const arr = domain.split('.');
@@ -162,3 +164,36 @@ export function parseOptimization(params: IOptimization) {
 }
 
 // TODO: 专门针对publish.yaml来处理default字段。不需要每次都都手动处理
+
+export const waitUntil = async ({
+  asyncService,
+  stopCondition,
+  timeout = 60 * 60 * 10, //10分超时时间
+  timeInterval = 350,
+  desc,
+}: {
+  asyncService: Promise<any>;
+  stopCondition: (result: any) => boolean;
+  timeInterval?: number;
+  timeout?: number;
+  desc: string;
+}) => {
+  let count = 0;
+  await chillout.waitUntil(async () => {
+    let isStop = false;
+    while (!isStop) {
+      count += timeInterval;
+      if (count >= timeout) {
+        Logger.debug('WEBSITE', `${desc} 等待超时`);
+        isStop = true;
+      }
+      await sleep(timeInterval);
+      // eslint-disable-next-line
+      const result = await asyncService;
+      if (stopCondition(result)) {
+        isStop = true;
+      }
+    }
+    return chillout.StopIteration;
+  });
+};

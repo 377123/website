@@ -3,10 +3,11 @@ import cloneDeep from 'lodash.clonedeep';
 import CdnService from './cdnclient.service';
 import DnsService from './dnsclient.service';
 import { ICdnSource, IDomainParams } from '../interface';
-import { parseDomain, sleep } from '../utils';
-import chillout from 'chillout';
+import { parseDomain, waitUntil } from '../utils';
 import get from 'lodash.get';
 
+const LOGCONTEXT = 'WEBSITE';
+const FIVE_MINUTE = 60 * 60 * 5;
 /**
  * OSS 源站
  * @param region
@@ -62,6 +63,7 @@ const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
   inputs.props = { ...props, type: 'oss' };
 
   const sysDomain = await domainConponent.get(inputs);
+  Logger.debug(LOGCONTEXT, `系统域名:${sysDomain}`);
   await modifyProps(
     get(inputs, 'project.projectName'),
     {
@@ -71,6 +73,16 @@ const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
     },
     get(inputs, 'path.configPath'),
   );
+
+  /**
+   * 修改证书前，看cname是否生效
+   */
+  await waitUntil({
+    asyncService: CdnService.describeCdnDomainDetail(cdnClient, sysDomain),
+    stopCondition: (result) => !!result.cname,
+    timeout: FIVE_MINUTE,
+    desc: '系统域名生效',
+  });
 
   await CdnService.setDomainServerCertificate(cdnClient, { domain: sysDomain });
 };
@@ -83,25 +95,20 @@ const generateDomain = async (params: IDomainParams) => {
   const dnsClient = DnsService.createClient(credentials);
   const { topDomain, rrDomainName } = parseDomain(domain);
 
-  let domainDetailMode = await CdnService.describeCdnDomainDetail(cdnClient, domain);
+  const domainDetailMode = await CdnService.describeCdnDomainDetail(cdnClient, domain);
   // 没有域名则添加域名
   if (!domainDetailMode) {
+    Logger.debug(LOGCONTEXT, `首次绑定自定义域名:${domain}`);
     // 第一次添加会出强制校验
     await CdnService.verifyDomainOwner(cdnClient, { domain });
     await CdnService.addCDNDomain(cdnClient, {
       domain,
       sources,
     });
-    await chillout.waitUntil(async () => {
-      let isStop = false;
-      while (!isStop) {
-        await sleep(350);
-        domainDetailMode = await CdnService.describeCdnDomainDetail(cdnClient, domain);
-        isStop = !!domainDetailMode.cname;
-        if (isStop) {
-          return chillout.StopIteration;
-        }
-      }
+    await waitUntil({
+      asyncService: CdnService.describeCdnDomainDetail(cdnClient, domain),
+      stopCondition: (result) => !!result.cname,
+      desc: 'DNS 首次配置生效',
     });
 
     await DnsService.addDomainRecord(dnsClient, {
@@ -111,6 +118,7 @@ const generateDomain = async (params: IDomainParams) => {
       value: domainDetailMode.cname,
     });
   } else {
+    Logger.debug(LOGCONTEXT, `绑定自定义域名:${domain}`);
     CdnService.modifyCdnDomain(cdnClient, { domain, sources });
   }
   await setDomainAdvancedConfig(cdnClient, { domain, hostObj });
