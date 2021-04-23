@@ -25,33 +25,113 @@ const getCdnOssSources = (region: string, bucket: string): ICdnSource => {
 const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
   const { access, https, optimization, redirects } = hostObj;
   // https 配置
-  await CdnService.setDomainServerCertificate(cdnClient, { domain, https });
+  try {
+    await CdnService.setDomainServerCertificate(cdnClient, { domain, https });
+  } catch (error) {
+    const message = get(error, 'message', '');
+    const messageCode = message.split(':')[0];
+    Logger.error(
+      LOGCONTEXT,
+      `https配置失败，请前往控制台页面 ${colors.green.underline(
+        `https://cdn.console.aliyun.com/domain/detail/${domain}/https`,
+      )} 进行手动操作，函数名：setDomainServerCertificate，错误码：${messageCode}`,
+    );
+    Logger.debug(LOGCONTEXT, error);
+  }
   // Referer 防盗链
   const referer = get(access, 'referer');
   if (referer) {
-    await CdnService.setCdnDomainReferer(cdnClient, { domain, referer });
+    try {
+      await CdnService.setCdnDomainReferer(cdnClient, { domain, referer });
+    } catch (error) {
+      const message = get(error, 'message', '');
+      const messageCode = message.split(':')[0];
+      Logger.error(
+        LOGCONTEXT,
+        `Referer防盗链配置失败，请前往控制台页面 ${colors.green.underline(
+          `https://cdn.console.aliyun.com/domain/detail/${domain}/access`,
+        )} tab ${colors.green(
+          'Referer防盗链',
+        )} 界面进行手动操作，函数名：setCdnDomainReferer，错误码：${messageCode}`,
+      );
+      Logger.debug(LOGCONTEXT, error);
+    }
   }
 
   // IP黑/白名单
   const ipFilter = get(access, 'ipFilter');
   if (ipFilter) {
-    await CdnService.setCdnDomainIpFilter(cdnClient, { domain, ipFilter });
+    try {
+      await CdnService.setCdnDomainIpFilter(cdnClient, { domain, ipFilter });
+    } catch (error) {
+      const message = get(error, 'message', '');
+      const messageCode = message.split(':')[0];
+      Logger.error(
+        LOGCONTEXT,
+        `IP黑/白名单配置失败，请前往控制台页面 ${colors.green.underline(
+          `https://cdn.console.aliyun.com/domain/detail/${domain}/access`,
+        )} tab ${colors.green(
+          'IP黑/白名单',
+        )} 界面进行手动操作，函数名：setCdnDomainIpFilter，错误码：${messageCode}`,
+      );
+      Logger.debug(LOGCONTEXT, error);
+    }
   }
 
   // UA黑/白名单
   const uaFilter = get(access, 'uaFilter');
   if (uaFilter) {
-    await CdnService.setCdnDomainUaFilter(cdnClient, { domain, uaFilter });
+    try {
+      await CdnService.setCdnDomainUaFilter(cdnClient, { domain, uaFilter });
+    } catch (error) {
+      const message = get(error, 'message', '');
+      const messageCode = message.split(':')[0];
+      Logger.error(
+        LOGCONTEXT,
+        `UA黑/白名单配置失败，请前往控制台页面 ${colors.green.underline(
+          `https://cdn.console.aliyun.com/domain/detail/${domain}/access`,
+        )} tab ${colors.green(
+          'UA黑/白名单',
+        )} 界面进行手动操作，函数名：setCdnDomainUaFilter，错误码：${messageCode}`,
+      );
+      Logger.debug(LOGCONTEXT, error);
+    }
   }
 
   // 性能优化
   if (optimization) {
-    await CdnService.setCdnDomainOptimization(cdnClient, { domain, optimization });
+    try {
+      await CdnService.setCdnDomainOptimization(cdnClient, { domain, optimization });
+    } catch (error) {
+      const message = get(error, 'message', '');
+      const messageCode = message.split(':')[0];
+      Logger.error(
+        LOGCONTEXT,
+        `性能优化配置失败，请前往控制台页面 ${colors.green.underline(
+          `https://cdn.console.aliyun.com/domain/detail/${domain}/perform`,
+        )} 进行手动操作，函数名：setCdnDomainOptimization，错误码：${messageCode}`,
+      );
+      Logger.debug(LOGCONTEXT, error);
+    }
   }
 
   // 重定向
   if (redirects) {
-    await CdnService.setCdnDomainRedirects(cdnClient, { domain, redirects });
+    try {
+      await CdnService.setCdnDomainRedirects(cdnClient, { domain, redirects });
+    } catch (error) {
+      const message = get(error, 'message', '');
+      const messageCode = message.split(':')[0];
+      Logger.error(
+        LOGCONTEXT,
+        `重定向配置失败，请前往控制台页面 ${colors.green.underline(
+          `https://cdn.console.aliyun.com/domain/detail/${domain}/cache`,
+        )} tab ${colors.green(
+          '重写',
+        )} 界面进行手动操作，函数名：setCdnDomainRedirects，错误码：${messageCode}`,
+      );
+      Logger.debug(LOGCONTEXT, error);
+    }
   }
 };
 
@@ -68,7 +148,19 @@ const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
   Logger.debug(LOGCONTEXT, `系统域名:${sysDomain}`);
   await DescribeUserDomains(cdnClient, sysDomain);
 
-  await CdnService.setDomainServerCertificate(cdnClient, { domain: sysDomain });
+  try {
+    await CdnService.setDomainServerCertificate(cdnClient, { domain: sysDomain });
+  } catch (error) {
+    const message = get(error, 'message', '');
+    const messageCode = message.split(':')[0];
+    Logger.error(
+      LOGCONTEXT,
+      `https配置失败，请前往控制台页面 ${colors.green.underline(
+        `https://cdn.console.aliyun.com/domain/detail/${sysDomain}/https`,
+      )} 进行手动操作，函数名：setDomainServerCertificate，错误码：${messageCode}`,
+    );
+    Logger.debug(LOGCONTEXT, error);
+  }
   Logger.log('首次生成域名大约10分钟后可以访问', 'yellow');
   Logger.log(`domainName: ${colors.green.underline(sysDomain)}`);
 };
@@ -89,7 +181,7 @@ const DescribeUserDomains = async (cdnClient, domain: string) => {
       timeInterval: 3000,
       timeoutMsg: `域名 ${colors.green(domain)} 生效时间等待超时`,
       hint: {
-        loading: `域名 ${colors.green.underline(domain)} 配置中, 预计需要10分钟`,
+        loading: `域名 ${colors.green.underline(domain)} 配置中, 首次生成域名预计需要10分钟`,
         success: `域名 ${colors.green.underline(domain)} 配置成功`,
         fail: `域名 ${colors.green.underline(domain)} 配置失败`,
       },
