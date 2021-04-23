@@ -83,7 +83,7 @@ const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
       checkDomainShow: true,
     });
     if (new Date().getTime() - startTime > TEN_MINUTE) {
-      Logger.debug('WEBSITE', '等待系统域名生效超时');
+      Logger.debug('WEBSITE', '系统域名生效时间等待超时');
       spin.fail('系统域名配置失败');
       return chillout.StopIteration;
     }
@@ -104,7 +104,9 @@ const generateDomain = async (params: IDomainParams) => {
   const dnsClient = DnsService.createClient(credentials);
   const { topDomain, rrDomainName } = parseDomain(domain);
 
-  const domainDetailMode = await CdnService.describeCdnDomainDetail(cdnClient, domain);
+  let domainDetailMode = await CdnService.describeCdnDomainDetail(cdnClient, domain);
+  Logger.debug(LOGCONTEXT, `查询绑定的域名信息:${JSON.stringify(domainDetailMode, null, 2)}`);
+
   // 没有域名则添加域名
   if (!domainDetailMode) {
     Logger.debug(LOGCONTEXT, `首次绑定自定义域名:${domain}`);
@@ -118,16 +120,16 @@ const generateDomain = async (params: IDomainParams) => {
     const startTime = new Date().getTime();
     await chillout.waitUntil(async () => {
       await sleep(3000);
-      const result = await CdnService.describeCdnDomainDetail(cdnClient, domain);
+      domainDetailMode = await CdnService.describeCdnDomainDetail(cdnClient, domain);
       if (new Date().getTime() - startTime > TEN_MINUTE) {
-        Logger.debug('WEBSITE', '等待 DNS 首次配置生效超时');
+        Logger.debug('WEBSITE', 'DNS 首次配置生效时间等待超时');
         return chillout.StopIteration;
       }
-      if (!!get(result, 'cname')) {
+      if (!!get(domainDetailMode, 'cname')) {
         return chillout.StopIteration;
       }
     });
-
+    Logger.debug(LOGCONTEXT, `首次绑定的域名信息:${JSON.stringify(domainDetailMode, null, 2)}`);
     await DnsService.addDomainRecord(dnsClient, {
       domainName: topDomain,
       RR: rrDomainName,

@@ -183,6 +183,7 @@ export default class Client {
   ): Promise<void> {
     // 添加CDN
     const addCdnDomainRequest = new $Cdn20180510.AddCdnDomainRequest({
+      scope: 'global',
       cdnType: 'web', // 图片小文件
       domainName: domain,
       sources: JSON.stringify([].concat(sources)),
