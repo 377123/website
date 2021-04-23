@@ -1,14 +1,13 @@
-import { loadComponent, Logger, spinner } from '@serverless-devs/core';
+import { loadComponent, Logger } from '@serverless-devs/core';
 import cloneDeep from 'lodash.clonedeep';
 import CdnService from './cdnclient.service';
 import DnsService from './dnsclient.service';
 import { ICdnSource, IDomainParams } from '../interface';
-import { parseDomain, sleep } from '../utils';
+import { parseDomain, waitUntil } from '../utils';
 import get from 'lodash.get';
-import chillout from 'chillout';
+import colors from 'colors';
 
 const LOGCONTEXT = 'WEBSITE';
-const TEN_MINUTE = 10 * 60 * 1000;
 /**
  * OSS 源站
  * @param region
@@ -60,40 +59,43 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
 const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
   const { credentials, inputs } = params;
   const { props } = inputs;
-  const domainConponent = await loadComponent(
-    'devsapp/domain',
-    'http://registry.serverlessfans.cn/simple',
-  );
+  const domainConponent = await loadComponent('devsapp/domain');
   const cdnClient = CdnService.createClient(credentials);
   // eslint-disable-next-line
   inputs.props = { ...props, type: 'oss' };
 
   const sysDomain = await domainConponent.get(inputs);
   Logger.debug(LOGCONTEXT, `系统域名:${sysDomain}`);
-
-  /**
-   * 修改证书前，查看域名是否配置成功
-   */
-  const startTime = new Date().getTime();
-  const spin = spinner('系统域名配置中...');
-  await chillout.waitUntil(async () => {
-    await sleep(3000);
-    const result = await CdnService.DescribeUserDomains(cdnClient, {
-      domain: sysDomain,
-      checkDomainShow: true,
-    });
-    if (new Date().getTime() - startTime > TEN_MINUTE) {
-      Logger.debug('WEBSITE', '系统域名生效时间等待超时');
-      spin.fail('系统域名配置失败');
-      return chillout.StopIteration;
-    }
-    if (get(result, 'domainStatus') === 'online') {
-      spin.succeed('系统域名配置成功');
-      return chillout.StopIteration;
-    }
-  });
+  await DescribeUserDomains(cdnClient, sysDomain);
 
   await CdnService.setDomainServerCertificate(cdnClient, { domain: sysDomain });
+  Logger.log('首次生成域名大约10分钟后可以访问', 'blue');
+  Logger.log(`domainName: ${colors.green.underline(sysDomain)}`);
+};
+
+/**
+ * 修改高级配置前，查看域名是否配置成功
+ */
+const DescribeUserDomains = async (cdnClient, domain: string) => {
+  const userDomains = await waitUntil(
+    async () => {
+      return await CdnService.DescribeUserDomains(cdnClient, {
+        domain,
+        checkDomainShow: true,
+      });
+    },
+    (result) => get(result, 'domainStatus') === 'online',
+    {
+      timeInterval: 3000,
+      timeoutMsg: `域名 ${colors.green(domain)} 生效时间等待超时`,
+      hint: {
+        loading: `域名 ${colors.green(domain)} 配置中...`,
+        success: `域名 ${colors.green(domain)} 配置成功`,
+        fail: `域名 ${colors.green(domain)} 配置失败`,
+      },
+    },
+  );
+  Logger.debug(LOGCONTEXT, `系统域名状态:${JSON.stringify(userDomains, null, 2)}`);
 };
 
 // 绑定到自定义域名
@@ -117,18 +119,17 @@ const generateDomain = async (params: IDomainParams) => {
       sources,
     });
 
-    const startTime = new Date().getTime();
-    await chillout.waitUntil(async () => {
-      await sleep(3000);
-      domainDetailMode = await CdnService.describeCdnDomainDetail(cdnClient, domain);
-      if (new Date().getTime() - startTime > TEN_MINUTE) {
-        Logger.debug('WEBSITE', 'DNS 首次配置生效时间等待超时');
-        return chillout.StopIteration;
-      }
-      if (get(domainDetailMode, 'cname')) {
-        return chillout.StopIteration;
-      }
-    });
+    domainDetailMode = await waitUntil(
+      async () => {
+        return await CdnService.describeCdnDomainDetail(cdnClient, domain);
+      },
+      (result) => get(result, 'cname'),
+      {
+        timeInterval: 3000,
+        timeoutMsg: 'DNS 首次配置生效时间等待超时',
+      },
+    );
+
     Logger.debug(LOGCONTEXT, `首次绑定的域名信息:${JSON.stringify(domainDetailMode, null, 2)}`);
     await DnsService.addDomainRecord(dnsClient, {
       domainName: topDomain,
@@ -136,11 +137,14 @@ const generateDomain = async (params: IDomainParams) => {
       type: 'CNAME',
       value: domainDetailMode.cname,
     });
+    await DescribeUserDomains(cdnClient, domain);
   } else {
     Logger.debug(LOGCONTEXT, `绑定自定义域名:${domain}`);
     CdnService.modifyCdnDomain(cdnClient, { domain, sources });
   }
   await setDomainAdvancedConfig(cdnClient, { domain, hostObj });
+  Logger.log('首次生成域名大约10分钟后可以访问', 'blue');
+  Logger.log(`domainName: ${colors.green.underline(domain)}`);
 };
 
 export default async (orinalInputs) => {

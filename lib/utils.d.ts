@@ -65,4 +65,4 @@ export declare const waitUntil: (asyncService: () => Promise<any>, stopCondition
         success: string;
         fail: string;
     };
-}) => Promise<void>;
+}) => Promise<any>;

@@ -187,12 +187,11 @@ export function parseRedirects(params: IRedirects[]) {
 
 // TODO: 专门针对publish.yaml来处理default字段。不需要每次都都手动处理
 
-// TODO: waitUntil方法有问题，待排查
 export const waitUntil = async (
   asyncService: () => Promise<any>,
   stopCondition: (result: any) => boolean,
   {
-    timeout = 15 * 60 * 1000, //15分超时时间
+    timeout = 10 * 60 * 1000, //10分超时时间
     timeInterval = 1000,
     timeoutMsg,
     hint,
@@ -207,19 +206,21 @@ export const waitUntil = async (
     };
   },
 ) => {
-  const spin = spinner(hint.loading);
+  const spin = hint && spinner(hint.loading);
   const startTime = new Date().getTime();
+  let result: any;
   await chillout.waitUntil(async () => {
     if (new Date().getTime() - startTime > timeout) {
       Logger.debug('WEBSITE', timeoutMsg);
-      spin.fail(hint.fail);
+      spin?.fail(hint.fail);
       return chillout.StopIteration;
     }
     await sleep(timeInterval);
-    const result = await asyncService();
+    result = await asyncService();
     if (stopCondition(result)) {
-      spin.succeed(hint.success);
+      spin?.succeed(hint.success);
       return chillout.StopIteration;
     }
   });
+  return result;
 };
