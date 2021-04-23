@@ -69,7 +69,7 @@ const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
   await DescribeUserDomains(cdnClient, sysDomain);
 
   await CdnService.setDomainServerCertificate(cdnClient, { domain: sysDomain });
-  Logger.log('首次生成域名大约10分钟后可以访问', 'blue');
+  Logger.log('首次生成域名大约10分钟后可以访问', 'yellow');
   Logger.log(`domainName: ${colors.green.underline(sysDomain)}`);
 };
 
@@ -89,9 +89,9 @@ const DescribeUserDomains = async (cdnClient, domain: string) => {
       timeInterval: 3000,
       timeoutMsg: `域名 ${colors.green(domain)} 生效时间等待超时`,
       hint: {
-        loading: `域名 ${colors.green(domain)} 配置中...`,
-        success: `域名 ${colors.green(domain)} 配置成功`,
-        fail: `域名 ${colors.green(domain)} 配置失败`,
+        loading: `域名 ${colors.green.underline(domain)} 配置中, 预计需要10分钟`,
+        success: `域名 ${colors.green.underline(domain)} 配置成功`,
+        fail: `域名 ${colors.green.underline(domain)} 配置失败`,
       },
     },
   );
@@ -143,7 +143,7 @@ const generateDomain = async (params: IDomainParams) => {
     CdnService.modifyCdnDomain(cdnClient, { domain, sources });
   }
   await setDomainAdvancedConfig(cdnClient, { domain, hostObj });
-  Logger.log('首次生成域名大约10分钟后可以访问', 'blue');
+  Logger.log('首次生成域名大约10分钟后可以访问', 'yellow');
   Logger.log(`domainName: ${colors.green.underline(domain)}`);
 };
 
@@ -167,6 +167,6 @@ export default async (orinalInputs) => {
       }),
     );
   } else {
-    Logger.log('如果需要系统帮你生成一个域名，可配置host为 auto ', 'blue');
+    Logger.log('如果需要系统帮你生成一个域名，可配置host为 auto ', 'yellow');
   }
 };
