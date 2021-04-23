@@ -56,7 +56,7 @@ export declare function parseRedirects(params: IRedirects[]): {
         argValue: string;
     }[];
 }[];
-export declare const waitUntil: (asyncService: Promise<any>, stopCondition: (result: any) => boolean, { timeout, timeInterval, timeoutMsg, hint, }: {
+export declare const waitUntil: (asyncService: () => Promise<any>, stopCondition: (result: any) => boolean, { timeout, timeInterval, timeoutMsg, hint, }: {
     timeInterval?: number;
     timeout?: number;
     timeoutMsg: string;

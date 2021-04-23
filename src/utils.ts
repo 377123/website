@@ -189,7 +189,7 @@ export function parseRedirects(params: IRedirects[]) {
 
 // TODO: waitUntil方法有问题，待排查
 export const waitUntil = async (
-  asyncService: Promise<any>,
+  asyncService: () => Promise<any>,
   stopCondition: (result: any) => boolean,
   {
     timeout = 15 * 60 * 1000, //15分超时时间
@@ -207,17 +207,16 @@ export const waitUntil = async (
     };
   },
 ) => {
-  let count = 0;
   const spin = spinner(hint.loading);
+  const startTime = new Date().getTime();
   await chillout.waitUntil(async () => {
-    count += timeInterval;
-    if (count >= timeout) {
+    if (new Date().getTime() - startTime > timeout) {
       Logger.debug('WEBSITE', timeoutMsg);
       spin.fail(hint.fail);
       return chillout.StopIteration;
     }
     await sleep(timeInterval);
-    const result = await asyncService;
+    const result = await asyncService();
     if (stopCondition(result)) {
       spin.succeed(hint.success);
       return chillout.StopIteration;

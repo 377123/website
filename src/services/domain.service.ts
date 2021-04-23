@@ -125,7 +125,7 @@ const generateDomain = async (params: IDomainParams) => {
         Logger.debug('WEBSITE', 'DNS 首次配置生效时间等待超时');
         return chillout.StopIteration;
       }
-      if (!!get(domainDetailMode, 'cname')) {
+      if (get(domainDetailMode, 'cname')) {
         return chillout.StopIteration;
       }
     });

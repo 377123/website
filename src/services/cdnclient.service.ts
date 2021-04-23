@@ -516,40 +516,4 @@ export default class Client {
     await client.batchSetCdnDomainConfig(cdnDomainStagingConfigRequest);
   }
 
-  /**
-   * 添加加速域名
-   * @param accessKeyId
-   * @param accessKeySecret
-   */
-  // static async addCDNDomain(
-  //   client,
-  //   { domain, cdnSource, esRule }: { domain: string; cdnSource: ICdnSource; esRule?: string },
-  // ): Promise<void> {
-
-  //   // 添加CDN
-  //   const addCdnDomainRequest = new $Cdn20180510.AddCdnDomainRequest({
-  //     cdnType: 'web', // 图片小文件
-  //     domainName: domain,
-  //     sources: JSON.stringify([].concat(cdnSource)),
-  //   });
-  //   // 复制代码运行请自行打印 API 的返回值
-  //   const cdnResult = await client.addCdnDomain(addCdnDomainRequest);
-  //   console.log(cdnResult);
-  //   // 添加到云解析DNS
-  //   console.log(`域名${domain}添加到云解析DNS`);
-  //   await DnsClient.addDomainRecord(credentials, {
-  //     domainName: topDomain,
-  //     RR: rrDomainName,
-  //     type: 'CNAME',
-  //     value: `${rrDomainName}.${topDomain}.w.alikunlun.com`,
-  //   });
-  //   if (esRule) {
-  //     console.log('开始 edge script灰度配置');
-  //     // 设置edge script灰度配置
-  //     await Client.setEsStagingConfig(credentials, { domain, rule: esRule });
-  //     console.log('edge script灰度配置发布到线上环境');
-  //     // 将edge script灰度配置发布到线上环境
-  //     await Client.publishEsStagingConfigToProduction(credentials, domain);
-  //   }
-  // }
 }
