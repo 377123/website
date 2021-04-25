@@ -31,7 +31,7 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
     const messageCode = message.split(':')[0];
     Logger.error(
       LOGCONTEXT,
-      `https配置失败，请前往控制台页面 ${colors.green.underline(
+      `https配置失败，请前往控制台页面 ${colors.cyan.underline(
         `https://cdn.console.aliyun.com/domain/detail/${domain}/https`,
       )} 进行手动操作，函数名：setDomainServerCertificate，错误码：${messageCode}`,
     );
@@ -47,7 +47,7 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
       const messageCode = message.split(':')[0];
       Logger.error(
         LOGCONTEXT,
-        `Referer防盗链配置失败，请前往控制台页面 ${colors.green.underline(
+        `Referer防盗链配置失败，请前往控制台页面 ${colors.cyan.underline(
           `https://cdn.console.aliyun.com/domain/detail/${domain}/access`,
         )} tab ${colors.green(
           'Referer防盗链',
@@ -67,7 +67,7 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
       const messageCode = message.split(':')[0];
       Logger.error(
         LOGCONTEXT,
-        `IP黑/白名单配置失败，请前往控制台页面 ${colors.green.underline(
+        `IP黑/白名单配置失败，请前往控制台页面 ${colors.cyan.underline(
           `https://cdn.console.aliyun.com/domain/detail/${domain}/access`,
         )} tab ${colors.green(
           'IP黑/白名单',
@@ -87,7 +87,7 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
       const messageCode = message.split(':')[0];
       Logger.error(
         LOGCONTEXT,
-        `UA黑/白名单配置失败，请前往控制台页面 ${colors.green.underline(
+        `UA黑/白名单配置失败，请前往控制台页面 ${colors.cyan.underline(
           `https://cdn.console.aliyun.com/domain/detail/${domain}/access`,
         )} tab ${colors.green(
           'UA黑/白名单',
@@ -106,7 +106,7 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
       const messageCode = message.split(':')[0];
       Logger.error(
         LOGCONTEXT,
-        `性能优化配置失败，请前往控制台页面 ${colors.green.underline(
+        `性能优化配置失败，请前往控制台页面 ${colors.cyan.underline(
           `https://cdn.console.aliyun.com/domain/detail/${domain}/perform`,
         )} 进行手动操作，函数名：setCdnDomainOptimization，错误码：${messageCode}`,
       );
@@ -123,7 +123,7 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
       const messageCode = message.split(':')[0];
       Logger.error(
         LOGCONTEXT,
-        `重定向配置失败，请前往控制台页面 ${colors.green.underline(
+        `重定向配置失败，请前往控制台页面 ${colors.cyan.underline(
           `https://cdn.console.aliyun.com/domain/detail/${domain}/cache`,
         )} tab ${colors.green(
           '重写',
@@ -154,13 +154,13 @@ const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
     const messageCode = message.split(':')[0];
     Logger.error(
       LOGCONTEXT,
-      `https配置失败，请前往控制台页面 ${colors.green.underline(
+      `https配置失败，请前往控制台页面 ${colors.cyan.underline(
         `https://cdn.console.aliyun.com/domain/detail/${sysDomain}/https`,
       )} 进行手动操作，函数名：setDomainServerCertificate，错误码：${messageCode}`,
     );
     Logger.debug(LOGCONTEXT, error);
   }
-  Logger.log(`domainName: ${colors.green.underline(`http:${sysDomain}`)}`);
+  Logger.log(`\ndomainName: ${colors.cyan.underline(`http://${sysDomain}`)}`);
 };
 
 /**
@@ -179,9 +179,9 @@ const DescribeUserDomains = async (cdnClient, domain: string) => {
       timeInterval: 3000,
       timeoutMsg: `域名 ${colors.green(domain)} 生效时间等待超时`,
       hint: {
-        loading: `域名 ${colors.green.underline(domain)} 配置中, 首次生成域名预计需要10分钟`,
-        success: `域名 ${colors.green.underline(domain)} 配置成功`,
-        fail: `域名 ${colors.green.underline(domain)} 配置失败`,
+        loading: `域名 ${colors.cyan.underline(domain)} 配置中, 首次生成域名预计需要10分钟`,
+        success: `域名 ${colors.cyan.underline(domain)} 配置成功`,
+        fail: `域名 ${colors.cyan.underline(domain)} 配置失败`,
       },
     },
   );
@@ -233,7 +233,7 @@ const generateDomain = async (params: IDomainParams) => {
     CdnService.modifyCdnDomain(cdnClient, { domain, sources });
   }
   await setDomainAdvancedConfig(cdnClient, { domain, hostObj });
-  Logger.log(`domainName: ${colors.green.underline(`http:${domain}`)}`);
+  Logger.log(`\ndomainName: ${colors.cyan.underline(`http://${domain}`)}`);
 };
 
 export default async (orinalInputs) => {
