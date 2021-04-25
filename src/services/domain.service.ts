@@ -1,11 +1,10 @@
-import { loadComponent, Logger } from '@serverless-devs/core';
+import { loadComponent, Logger, colors } from '@serverless-devs/core';
 import cloneDeep from 'lodash.clonedeep';
 import CdnService from './cdnclient.service';
 import DnsService from './dnsclient.service';
 import { ICdnSource, IDomainParams } from '../interface';
 import { parseDomain, waitUntil } from '../utils';
 import get from 'lodash.get';
-import colors from 'colors';
 
 const LOGCONTEXT = 'WEBSITE';
 /**
@@ -161,8 +160,7 @@ const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
     );
     Logger.debug(LOGCONTEXT, error);
   }
-  Logger.log('首次生成域名大约10分钟后可以访问', 'yellow');
-  Logger.log(`domainName: ${colors.green.underline(sysDomain)}`);
+  Logger.log(`domainName: ${colors.green.underline(`http:${sysDomain}`)}`);
 };
 
 /**
@@ -235,8 +233,7 @@ const generateDomain = async (params: IDomainParams) => {
     CdnService.modifyCdnDomain(cdnClient, { domain, sources });
   }
   await setDomainAdvancedConfig(cdnClient, { domain, hostObj });
-  Logger.log('首次生成域名大约10分钟后可以访问', 'yellow');
-  Logger.log(`domainName: ${colors.green.underline(domain)}`);
+  Logger.log(`domainName: ${colors.green.underline(`http:${domain}`)}`);
 };
 
 export default async (orinalInputs) => {

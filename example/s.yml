@@ -2,7 +2,7 @@ edition: 1.0.0
 services:
   website:
     component: /Users/shihuali/workspace/website/lib/index.js
-    access: my
+    access: default
     props:
       bucket: shl-website-vuepress-01
       src:
