@@ -82,7 +82,7 @@ services:
 | region   |  否  | string          | `cn-hangzhou` | 代码上传所在的 cos 区域。区。                                                             |
 | env      |  否  | [Env](#Env)     |               | 环境变量参数文件。会将 env 下配置的参数写入 env.js 文件中，将该文件打包上传到你的代码里。 |
 | cors     |  否  | [Cors](#Cors)[] |               | 跨域访问配置                                                                              |
-| hosts    |  否  | [Cdn](#Cdn)[]   |               | CND 加速域名配置                                                                          |
+| hosts    |  否  | [Cdn](#Cdn)[]   |               | CDN 加速域名配置                                                                          |
 
 ### Src
 
