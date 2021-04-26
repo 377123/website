@@ -1,7 +1,8 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { loadComponent } from '@serverless-devs/core';
+import { loadComponent, Logger } from '@serverless-devs/core';
 import get from 'lodash.get';
+import cloneDeep from 'lodash.clonedeep';
 
 const generateService = (serviceName: string) => {
   return {
@@ -10,7 +11,7 @@ const generateService = (serviceName: string) => {
   };
 };
 
-const generateFunction = (codeUri: string, functionName: string, ...reset: any) => {
+const generateFunction = (codeUri: string, functionName: string, ...rest: any) => {
   const {
     description,
     runtime,
@@ -21,7 +22,7 @@ const generateFunction = (codeUri: string, functionName: string, ...reset: any) 
     initializationTimeout,
     instanceConcurrency,
     instanceType,
-  } = reset;
+  } = rest;
   return {
     codeUri,
     name: functionName,
@@ -53,21 +54,22 @@ const generateHttpTriggers = (config?: any) => {
   ];
 };
 
-export const generateFcSpec = async (inputs) => {
+const deployFcFunction = async ({ inputs, hostObj }) => {
+  const { props } = inputs;
   const accountID = get(inputs, 'Credentials.AccountID');
-  const props = get(inputs, 'props', {});
-  const { service, codeUri, functions } = get(inputs, 'props.faas', {});
+  const { service, codeUri, functions } = hostObj.faas;
   if (!functions) {
     const functionDir = path.join(process.cwd(), codeUri);
+
     if (!fs.ensureDir(functionDir)) {
       throw new Error(`${functionDir} is not exist`);
     }
     const functionPaths = fs.readdirSync(functionDir);
 
-    if (functionPaths && functionPaths.length) {
+    if (functionPaths?.length > 0) {
       return Promise.all(
         functionPaths
-          .filter((functionName) => functionName.indexOf('.js') > -1)
+          .filter((functionName) => functionName.endsWith('.js'))
           .map(async (name) => {
             const { region } = props;
             const fcDeployFuncion = {
@@ -76,6 +78,14 @@ export const generateFcSpec = async (inputs) => {
               function: generateFunction(codeUri, name.replace('.js', '')),
               triggers: generateHttpTriggers(),
             };
+            Logger.debug(
+              'WEBSITE',
+              `devsapp/fc-deploy 调用 deploy方法入参fcDeployFuncion: ${JSON.stringify(
+                fcDeployFuncion,
+                null,
+                2,
+              )}`,
+            );
             const fcDeploy = await loadComponent('devsapp/fc-deploy');
             delete inputs.props;
             const result = await fcDeploy.deploy({
@@ -83,10 +93,31 @@ export const generateFcSpec = async (inputs) => {
               ...inputs,
             });
             const { region: curRegion, function: funcName } = result;
-            const httpUrl = `${accountID}.${curRegion}.fc.aliyuncs.com/<version>/proxy/${service.name}/${funcName.name}/`;
+            Logger.debug(
+              'WEBSITE',
+              `devsapp/fc-deploy 调用 deploy方法返回的result: ${JSON.stringify(result, null, 2)}`,
+            );
+
+            const httpUrl = `${accountID}.${curRegion}.fc.aliyuncs.com/<version>/proxy/${service}/${funcName.name}/`;
             return { name, httpUrl };
           }),
       );
     }
+  }
+};
+
+export const generateFcSpec = async (orinalInputs) => {
+  const inputs = cloneDeep(orinalInputs);
+  const { props } = inputs;
+  const { hosts } = props;
+
+  if (hosts?.length > 0) {
+    return await Promise.all(
+      hosts.map(async (hostObj) => {
+        if (hostObj.faas) {
+          return await deployFcFunction({ inputs, hostObj });
+        }
+      }),
+    );
   }
 };

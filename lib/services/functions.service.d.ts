@@ -1,4 +1,1 @@
-export declare const generateFcSpec: (inputs: any) => Promise<{
-    name: string;
-    httpUrl: string;
-}[]>;
+export declare const generateFcSpec: (orinalInputs: any) => Promise<[unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown, unknown]>;

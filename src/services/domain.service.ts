@@ -135,7 +135,7 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
 };
 
 // 生成系统域名
-const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
+const generateSystemDomain = async (params: IDomainParams): Promise<{ domain: string }> => {
   const { credentials, inputs } = params;
   const { props } = inputs;
   const domainConponent = await loadComponent('devsapp/domain');
@@ -161,6 +161,7 @@ const generateSystemDomain = async (params: IDomainParams): Promise<any> => {
     Logger.debug(LOGCONTEXT, error);
   }
   Logger.log(`\ndomainName: ${colors.cyan.underline(`http://${sysDomain}`)}`);
+  return { domain: sysDomain };
 };
 
 /**
@@ -189,7 +190,7 @@ const DescribeUserDomains = async (cdnClient, domain: string) => {
 };
 
 // 绑定到自定义域名
-const generateDomain = async (params: IDomainParams) => {
+const generateDomain = async (params: IDomainParams): Promise<{ domain: string }> => {
   const { credentials, hostObj, sources } = params;
   const { host: domain } = hostObj;
   const cdnClient = CdnService.createClient(credentials);
@@ -234,6 +235,7 @@ const generateDomain = async (params: IDomainParams) => {
   }
   await setDomainAdvancedConfig(cdnClient, { domain, hostObj });
   Logger.log(`\ndomainName: ${colors.cyan.underline(`http://${domain}`)}`);
+  return { domain };
 };
 
 export default async (orinalInputs) => {
@@ -247,14 +249,17 @@ export default async (orinalInputs) => {
   const { hosts } = props;
   if (hosts?.length > 0) {
     await Promise.all(
-      hosts.map(async (hostObj) => {
+      hosts.map(async (hostObj, index) => {
+        let domainInfo: { domain: string };
         if (hostObj.host === 'auto') {
-          await generateSystemDomain({ credentials, inputs, sources });
+          domainInfo = await generateSystemDomain({ credentials, inputs, sources });
         } else {
-          await generateDomain({ credentials, hostObj, sources });
+          domainInfo = await generateDomain({ credentials, hostObj, sources });
         }
+        props.hosts[index].domain = domainInfo.domain;
       }),
     );
+    return inputs;
   } else {
     Logger.log('如果需要系统帮你生成一个域名，可配置host为 auto ', 'yellow');
   }

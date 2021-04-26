@@ -1,23 +1,19 @@
 edition: 1.0.0
 services:
   website:
-    component: /Users/shihuali/workspace/website/lib/index.js
+    component: "/Users/shihuali/workspace/website/lib/index.js"
     access: default
     props:
       bucket: shl-website-vuepress-01
       src:
-        codeUri: ./
-        publishDir: ./build
-        buildCommand: npm run build
+        codeUri: "./"
+        publishDir: "./build"
+        # buildCommand: npm run build
         index: index.html
         error: index.html
       region: cn-hangzhou
       hosts:
-        - host: s.shihuali.top
-          redirects:
-            - switch: on
-              source: /intro/
-              destination: /basic-config/
-            - switch: on
-              source: /basic-config/
-              destination: /a
+        - host: auto
+          faas:
+            service: shl-midway-app
+            codeUri: "./functions"
