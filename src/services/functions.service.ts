@@ -3,6 +3,8 @@ import path from 'path';
 import { loadComponent, Logger } from '@serverless-devs/core';
 import get from 'lodash.get';
 import cloneDeep from 'lodash.clonedeep';
+import DnsService from './dnsclient.service';
+import { parseDomain } from '../utils';
 
 const generateService = (serviceName: string) => {
   return {
@@ -117,15 +119,32 @@ const deployFcFunction = async ({ inputs, hostObj }) => {
   }
 };
 
+const addDomainRecord = async ({ credentials, domain }) => {
+  const dnsClient = DnsService.createClient(credentials);
+  const { topDomain, rrDomainName } = parseDomain(domain);
+  await DnsService.addDomainRecord(dnsClient, {
+    domainName: topDomain,
+    RR: rrDomainName,
+    type: 'CNAME',
+    value: `${credentials.accountID}.cn-hangzhou.fc.aliyuncs.com`,
+  });
+};
+
 export const generateFcSpec = async (orinalInputs) => {
   const inputs = cloneDeep(orinalInputs);
   const { props } = inputs;
   const { hosts } = props;
+  const credentials = {
+    accountID: get(inputs, 'Credentials.AccountID'),
+    accessKeyId: get(inputs, 'Credentials.AccessKeyID'),
+    accessKeySecret: get(inputs, 'Credentials.AccessKeySecret'),
+  };
 
   if (hosts?.length > 0) {
     return await Promise.all(
       hosts.map(async (hostObj) => {
         if (hostObj.faas) {
+          await addDomainRecord({ credentials, domain: hostObj.domain });
           return await deployFcFunction({ inputs, hostObj });
         }
       }),
