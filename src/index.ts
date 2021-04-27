@@ -41,7 +41,7 @@ export default class WebsiteComponent {
     this.logger.debug(`deployFunction inputs params: ${JSON.stringify(inputs, null, 2)}`);
 
     const result = await generateFcSpec(inputs);
-    this.logger.debug(`generateFcSpec result: ${JSON.stringify(result, null, 2)}`);
+    this.logger.debug(`deployFunction result: ${JSON.stringify(result, null, 2)}`);
   }
   async remove(inputs: any) {
     // 删除所有用到的资源以及配置等

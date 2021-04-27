@@ -46,7 +46,6 @@ export default class Client {
     );
     try {
       const result = await client.addDomainRecord(addDomainRecordRequest);
-      Logger.log('配置CNAME后大约有10分钟延迟才会更新该列状态。', 'yellow');
       return result;
     } catch (error) {
       Logger.warn('WEBSITE', `使用阿里DNS解析失败, 请手动配置CNAME${addDomainRecordParams.value}`);

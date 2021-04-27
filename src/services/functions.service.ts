@@ -54,6 +54,21 @@ const generateHttpTriggers = (config?: any) => {
   ];
 };
 
+const generteCustomDomains = ({ functionName, domain, protocol }) => {
+  // const prefix = protocol === 'http' ? 'http://' : 'https://';
+  return [
+    {
+      domainName: domain,
+      protocol: 'HTTP',
+      routeConfigs: [
+        {
+          path: `/api/${functionName}`,
+        },
+      ],
+    },
+  ];
+};
+
 const deployFcFunction = async ({ inputs, hostObj }) => {
   const { props } = inputs;
   const accountID = get(inputs, 'Credentials.AccountID');
@@ -77,27 +92,23 @@ const deployFcFunction = async ({ inputs, hostObj }) => {
               service: generateService(service),
               function: generateFunction(codeUri, name.replace('.js', '')),
               triggers: generateHttpTriggers(),
+              customDomains: generteCustomDomains({
+                domain: hostObj.domain,
+                protocol: get(hostObj, 'https.protocol', 'https'),
+                functionName: name.replace('.js', ''),
+              }),
+            };
+            const fcDeploy = await loadComponent('devsapp/fc-deploy');
+            const deployParams = {
+              ...inputs,
+              props: fcDeployFuncion,
             };
             Logger.debug(
               'WEBSITE',
-              `devsapp/fc-deploy 调用 deploy方法入参fcDeployFuncion: ${JSON.stringify(
-                fcDeployFuncion,
-                null,
-                2,
-              )}`,
+              `fc-deploy inputs params: ${JSON.stringify(deployParams, null, 2)}`,
             );
-            const fcDeploy = await loadComponent('devsapp/fc-deploy');
-            delete inputs.props;
-            const result = await fcDeploy.deploy({
-              props: fcDeployFuncion,
-              ...inputs,
-            });
+            const result = await fcDeploy.deploy(deployParams);
             const { region: curRegion, function: funcName } = result;
-            Logger.debug(
-              'WEBSITE',
-              `devsapp/fc-deploy 调用 deploy方法返回的result: ${JSON.stringify(result, null, 2)}`,
-            );
-
             const httpUrl = `${accountID}.${curRegion}.fc.aliyuncs.com/<version>/proxy/${service}/${funcName.name}/`;
             return { name, httpUrl };
           }),
