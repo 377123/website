@@ -3,6 +3,7 @@ import Alidns20150109, * as $Alidns20150109 from '@alicloud/alidns20150109';
 import * as $OpenApi from '@alicloud/openapi-client';
 import { Logger } from '@serverless-devs/core';
 import { ICredentials } from '../interface';
+const logger = new Logger('WEBSITE');
 
 export interface IAddDomainRecord {
   domainName: string;
@@ -48,7 +49,7 @@ export default class Client {
       const result = await client.addDomainRecord(addDomainRecordRequest);
       return result;
     } catch (error) {
-      Logger.warn('WEBSITE', `使用阿里DNS解析失败, 请手动配置CNAME${addDomainRecordParams.value}`);
+      logger.warn(`使用阿里DNS解析失败, 请手动配置CNAME${addDomainRecordParams.value}`);
     }
   }
 

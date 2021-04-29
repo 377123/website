@@ -5,8 +5,8 @@ import DnsService from './dnsclient.service';
 import { ICdnSource, IDomainParams } from '../interface';
 import { parseDomain, waitUntil } from '../utils';
 import get from 'lodash.get';
+const logger = new Logger('WEBSITE');
 
-const LOGCONTEXT = 'WEBSITE';
 /**
  * OSS 源站
  * @param region
@@ -29,13 +29,12 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
   } catch (error) {
     const message = get(error, 'message', '');
     const messageCode = message.split(':')[0];
-    Logger.error(
-      LOGCONTEXT,
+    logger.error(
       `https配置失败，请前往控制台页面 ${colors.cyan.underline(
         `https://cdn.console.aliyun.com/domain/detail/${domain}/https`,
       )} 进行手动操作，函数名：setDomainServerCertificate，错误码：${messageCode}`,
     );
-    Logger.debug(LOGCONTEXT, error);
+    logger.debug(error);
   }
   // Referer 防盗链
   const referer = get(access, 'referer');
@@ -45,15 +44,14 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
     } catch (error) {
       const message = get(error, 'message', '');
       const messageCode = message.split(':')[0];
-      Logger.error(
-        LOGCONTEXT,
+      logger.error(
         `Referer防盗链配置失败，请前往控制台页面 ${colors.cyan.underline(
           `https://cdn.console.aliyun.com/domain/detail/${domain}/access`,
         )} tab ${colors.green(
           'Referer防盗链',
         )} 界面进行手动操作，函数名：setCdnDomainReferer，错误码：${messageCode}`,
       );
-      Logger.debug(LOGCONTEXT, error);
+      logger.debug(error);
     }
   }
 
@@ -65,15 +63,14 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
     } catch (error) {
       const message = get(error, 'message', '');
       const messageCode = message.split(':')[0];
-      Logger.error(
-        LOGCONTEXT,
+      logger.error(
         `IP黑/白名单配置失败，请前往控制台页面 ${colors.cyan.underline(
           `https://cdn.console.aliyun.com/domain/detail/${domain}/access`,
         )} tab ${colors.green(
           'IP黑/白名单',
         )} 界面进行手动操作，函数名：setCdnDomainIpFilter，错误码：${messageCode}`,
       );
-      Logger.debug(LOGCONTEXT, error);
+      logger.debug(error);
     }
   }
 
@@ -85,15 +82,14 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
     } catch (error) {
       const message = get(error, 'message', '');
       const messageCode = message.split(':')[0];
-      Logger.error(
-        LOGCONTEXT,
+      logger.error(
         `UA黑/白名单配置失败，请前往控制台页面 ${colors.cyan.underline(
           `https://cdn.console.aliyun.com/domain/detail/${domain}/access`,
         )} tab ${colors.green(
           'UA黑/白名单',
         )} 界面进行手动操作，函数名：setCdnDomainUaFilter，错误码：${messageCode}`,
       );
-      Logger.debug(LOGCONTEXT, error);
+      logger.debug(error);
     }
   }
 
@@ -104,13 +100,12 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
     } catch (error) {
       const message = get(error, 'message', '');
       const messageCode = message.split(':')[0];
-      Logger.error(
-        LOGCONTEXT,
+      logger.error(
         `性能优化配置失败，请前往控制台页面 ${colors.cyan.underline(
           `https://cdn.console.aliyun.com/domain/detail/${domain}/perform`,
         )} 进行手动操作，函数名：setCdnDomainOptimization，错误码：${messageCode}`,
       );
-      Logger.debug(LOGCONTEXT, error);
+      logger.debug(error);
     }
   }
 
@@ -121,15 +116,14 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
     } catch (error) {
       const message = get(error, 'message', '');
       const messageCode = message.split(':')[0];
-      Logger.error(
-        LOGCONTEXT,
+      logger.error(
         `重定向配置失败，请前往控制台页面 ${colors.cyan.underline(
           `https://cdn.console.aliyun.com/domain/detail/${domain}/cache`,
         )} tab ${colors.green(
           '重写',
         )} 界面进行手动操作，函数名：setCdnDomainRedirects，错误码：${messageCode}`,
       );
-      Logger.debug(LOGCONTEXT, error);
+      logger.debug(error);
     }
   }
 };
@@ -144,7 +138,7 @@ const generateSystemDomain = async (params: IDomainParams): Promise<{ domain: st
   inputs.props = { ...props, type: 'oss' };
 
   const sysDomain = await domainConponent.get(inputs);
-  Logger.debug(LOGCONTEXT, `系统域名:${sysDomain}`);
+  logger.debug(`系统域名:${sysDomain}`);
   await DescribeUserDomains(cdnClient, sysDomain);
 
   try {
@@ -152,15 +146,14 @@ const generateSystemDomain = async (params: IDomainParams): Promise<{ domain: st
   } catch (error) {
     const message = get(error, 'message', '');
     const messageCode = message.split(':')[0];
-    Logger.error(
-      LOGCONTEXT,
+    logger.error(
       `https配置失败，请前往控制台页面 ${colors.cyan.underline(
         `https://cdn.console.aliyun.com/domain/detail/${sysDomain}/https`,
       )} 进行手动操作，函数名：setDomainServerCertificate，错误码：${messageCode}`,
     );
-    Logger.debug(LOGCONTEXT, error);
+    logger.debug(error);
   }
-  Logger.log(`\ndomainName: ${colors.cyan.underline(`http://${sysDomain}`)}`);
+  logger.log(`\ndomainName: ${colors.cyan.underline(`http://${sysDomain}`)}`);
   return { domain: sysDomain };
 };
 
@@ -186,7 +179,7 @@ const DescribeUserDomains = async (cdnClient, domain: string) => {
       },
     },
   );
-  Logger.debug(LOGCONTEXT, `系统域名状态:${JSON.stringify(userDomains, null, 2)}`);
+  logger.debug(`系统域名状态:${JSON.stringify(userDomains, null, 2)}`);
 };
 
 // 绑定到自定义域名
@@ -198,11 +191,11 @@ const generateDomain = async (params: IDomainParams): Promise<{ domain: string }
   const { topDomain, rrDomainName } = parseDomain(domain);
 
   let domainDetailMode = await CdnService.describeCdnDomainDetail(cdnClient, domain);
-  Logger.debug(LOGCONTEXT, `查询绑定的域名信息:${JSON.stringify(domainDetailMode, null, 2)}`);
+  logger.debug(`查询绑定的域名信息:${JSON.stringify(domainDetailMode, null, 2)}`);
 
   // 没有域名则添加域名
   if (!domainDetailMode) {
-    Logger.debug(LOGCONTEXT, `首次绑定自定义域名:${domain}`);
+    logger.debug(`首次绑定自定义域名:${domain}`);
     // 第一次添加会出强制校验
     await CdnService.verifyDomainOwner(cdnClient, { domain });
     await CdnService.addCDNDomain(cdnClient, {
@@ -221,7 +214,7 @@ const generateDomain = async (params: IDomainParams): Promise<{ domain: string }
       },
     );
 
-    Logger.debug(LOGCONTEXT, `首次绑定的域名信息:${JSON.stringify(domainDetailMode, null, 2)}`);
+    logger.debug(`首次绑定的域名信息:${JSON.stringify(domainDetailMode, null, 2)}`);
     await DnsService.addDomainRecord(dnsClient, {
       domainName: topDomain,
       RR: rrDomainName,
@@ -230,11 +223,11 @@ const generateDomain = async (params: IDomainParams): Promise<{ domain: string }
     });
     await DescribeUserDomains(cdnClient, domain);
   } else {
-    Logger.debug(LOGCONTEXT, `绑定自定义域名:${domain}`);
+    logger.debug(`绑定自定义域名:${domain}`);
     CdnService.modifyCdnDomain(cdnClient, { domain, sources });
   }
   await setDomainAdvancedConfig(cdnClient, { domain, hostObj });
-  Logger.log(`\ndomainName: ${colors.cyan.underline(`http://${domain}`)}`);
+  logger.log(`\ndomainName: ${colors.cyan.underline(`http://${domain}`)}`);
   return { domain };
 };
 
@@ -261,6 +254,6 @@ export default async (orinalInputs) => {
     );
     return inputs;
   } else {
-    Logger.log('如果需要系统帮你生成一个域名，可配置host为 auto ', 'yellow');
+    logger.log('如果需要系统帮你生成一个域名，可配置host为 auto ', 'yellow');
   }
 };

@@ -5,6 +5,7 @@ import get from 'lodash.get';
 import cloneDeep from 'lodash.clonedeep';
 import DnsService from './dnsclient.service';
 import { parseDomain } from '../utils';
+const logger = new Logger('WEBSITE');
 
 const generateService = (serviceName: string) => {
   return {
@@ -105,10 +106,7 @@ const deployFcFunction = async ({ inputs, hostObj }) => {
               ...inputs,
               props: fcDeployFuncion,
             };
-            Logger.debug(
-              'WEBSITE',
-              `fc-deploy inputs params: ${JSON.stringify(deployParams, null, 2)}`,
-            );
+            logger.debug(`fc-deploy inputs params: ${JSON.stringify(deployParams, null, 2)}`);
             const result = await fcDeploy.deploy(deployParams);
             const { region: curRegion, function: funcName } = result;
             const httpUrl = `${accountID}.${curRegion}.fc.aliyuncs.com/<version>/proxy/${service}/${funcName.name}/`;

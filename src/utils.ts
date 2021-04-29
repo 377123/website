@@ -11,6 +11,7 @@ import {
 import get from 'lodash.get';
 import chillout from 'chillout';
 import { Logger, spinner } from '@serverless-devs/core';
+const logger = new Logger('WEBSITE');
 
 export const parseDomain = (domain: string): IDomain => {
   const arr = domain.split('.');
@@ -211,7 +212,7 @@ export const waitUntil = async (
   let result: any;
   await chillout.waitUntil(async () => {
     if (new Date().getTime() - startTime > timeout) {
-      Logger.debug('WEBSITE', timeoutMsg);
+      logger.debug(timeoutMsg);
       spin?.fail(hint.fail);
       return chillout.StopIteration;
     }

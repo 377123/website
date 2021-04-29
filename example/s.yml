@@ -18,7 +18,7 @@ services:
             certInfo:
               switch: off
             protocol: http
-          faas:
-            service: shl-midway-app
-            codeUri: "./functions"
+          # faas:
+          #   service: shl-midway-app
+          #   codeUri: "./functions"
             
