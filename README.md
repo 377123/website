@@ -106,3 +106,4 @@ $ s config add
 [全量配置](./docs/config.md)
 
 [高级配置](./docs/advance.md)
+
