@@ -17,6 +17,8 @@ services:
         buildCommand: npm run build
         index: index.html
         error: index.html
+        subDir:
+          type: noSuchKey/index/redirect
       region: cn-hangzhou
       env:
         API_URL: https://api.com

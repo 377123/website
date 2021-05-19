@@ -17,6 +17,8 @@ services:
       src:
         codeUri: ./
         publishDir: ./build
+        subDir:
+          type: index
       region: cn-hangzhou
       env: 
         API_URL: https://api.com

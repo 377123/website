@@ -1,5 +1,6 @@
 import OssClient from 'ali-oss';
 interface ISrc {
+    subDir: any;
     publishDir: string;
     codeUri?: string;
     buildCommand?: string;

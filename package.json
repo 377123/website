@@ -1,6 +1,6 @@
 {
   "name": "jamstack",
-  "version": "0.0.1",
+  "version": "0.0.19",
   "main": "./lib/index.js",
   "dependencies": {
     "@alicloud/alidns20150109": "^1.0.2",
