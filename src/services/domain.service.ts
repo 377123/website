@@ -5,6 +5,7 @@ import DnsService from './dnsclient.service';
 import { ICdnSource, IDomainParams } from '../interface';
 import { parseDomain, waitUntil } from '../utils';
 import get from 'lodash.get';
+import sleep from 'sleep';
 
 const LOGCONTEXT = 'WEBSITE';
 /**
@@ -134,6 +135,7 @@ const setDomainAdvancedConfig = async (cdnClient, { domain, hostObj }) => {
   }
 };
 
+
 // 生成系统域名
 const generateSystemDomain = async (params: IDomainParams): Promise<{ domain: string }> => {
   const { credentials, inputs } = params;
@@ -142,8 +144,16 @@ const generateSystemDomain = async (params: IDomainParams): Promise<{ domain: st
   const cdnClient = CdnService.createClient(credentials);
   // eslint-disable-next-line
   inputs.props = { ...props, type: 'oss' };
-
-  const sysDomain = await domainConponent.get(inputs);
+  let sysDomain
+  for(let i=0;i<5;i++){
+    try{
+      sleep.sleep(5)
+      sysDomain = await domainConponent.get(inputs);
+      break
+    }catch (e){
+      sleep.sleep(1)
+    }
+  }
   Logger.debug(LOGCONTEXT, `Test Domain: ${sysDomain}`);
   await DescribeUserDomains(cdnClient, sysDomain);
 
