@@ -144,22 +144,22 @@ const generateSystemDomain = async (params: IDomainParams): Promise<{ domain: st
   inputs.props = { ...props, type: 'oss' };
 
   const sysDomain = await domainConponent.get(inputs);
-  Logger.debug(LOGCONTEXT, `系统域名:${sysDomain}`);
+  Logger.debug(LOGCONTEXT, `Test Domain: ${sysDomain}`);
   await DescribeUserDomains(cdnClient, sysDomain);
 
-  try {
-    await CdnService.setDomainServerCertificate(cdnClient, { domain: sysDomain });
-  } catch (error) {
-    const message = get(error, 'message', '');
-    const messageCode = message.split(':')[0];
-    Logger.error(
-      LOGCONTEXT,
-      `https配置失败，请前往控制台页面 ${colors.cyan.underline(
-        `https://cdn.console.aliyun.com/domain/detail/${sysDomain}/https`,
-      )} 进行手动操作，函数名：setDomainServerCertificate，错误码：${messageCode}`,
-    );
-    Logger.debug(LOGCONTEXT, error);
-  }
+  // try {
+  //   await CdnService.setDomainServerCertificate(cdnClient, { domain: sysDomain });
+  // } catch (error) {
+  //   const message = get(error, 'message', '');
+  //   const messageCode = message.split(':')[0];
+  //   Logger.error(
+  //     LOGCONTEXT,
+  //     `https配置失败，请前往控制台页面 ${colors.cyan.underline(
+  //       `https://cdn.console.aliyun.com/domain/detail/${sysDomain}/https`,
+  //     )} 进行手动操作，函数名：setDomainServerCertificate，错误码：${messageCode}`,
+  //   );
+  //   Logger.debug(LOGCONTEXT, error);
+  // }
   Logger.log(`\ndomainName: ${colors.cyan.underline(`http://${sysDomain}`)}`);
   return { domain: sysDomain };
 };
@@ -180,9 +180,9 @@ const DescribeUserDomains = async (cdnClient, domain: string) => {
       timeInterval: 3000,
       timeoutMsg: `域名 ${colors.green(domain)} 生效时间等待超时`,
       hint: {
-        loading: `域名 ${colors.cyan.underline(domain)} 配置中, 首次生成域名预计需要10分钟`,
-        success: `域名 ${colors.cyan.underline(domain)} 配置成功`,
-        fail: `域名 ${colors.cyan.underline(domain)} 配置失败`,
+        loading: `In the configuration of domain name ${colors.cyan.underline(domain)}, it takes a long time to generate a domain name for the first time. Please wait patiently`,
+        success: `The domain name ${colors.cyan.underline(domain)} is configured successfully`,
+        fail: `Failed to configure the domain name ${colors.cyan.underline(domain)}`,
       },
     },
   );

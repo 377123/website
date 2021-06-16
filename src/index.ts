@@ -31,17 +31,17 @@ export default class WebsiteComponent {
     };
     await env(inputs);
     await oss(ossConfig);
-    spinner('OSS静态资源部署成功').succeed();
+    spinner('OSS static source deployed success').succeed();
     // 挂载域名
     const domainInputs = await domain(inputs);
     await this.deployFunction({ ...inputs, ...domainInputs });
   }
 
   async deployFunction(inputs: any) {
-    this.logger.debug(`deployFunction inputs params: ${JSON.stringify(inputs, null, 2)}`);
+    this.logger.debug(`Deploy function inputs params: ${JSON.stringify(inputs, null, 2)}`);
 
     const result = await generateFcSpec(inputs);
-    this.logger.debug(`deployFunction result: ${JSON.stringify(result, null, 2)}`);
+    this.logger.debug(`Deploy function result: ${JSON.stringify(result, null, 2)}`);
   }
   async remove(inputs: any) {
     // 删除所有用到的资源以及配置等
