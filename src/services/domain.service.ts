@@ -5,7 +5,6 @@ import DnsService from './dnsclient.service';
 import { ICdnSource, IDomainParams } from '../interface';
 import { parseDomain, waitUntil } from '../utils';
 import get from 'lodash.get';
-import sleep from 'sleep';
 
 const LOGCONTEXT = 'WEBSITE';
 /**
@@ -147,11 +146,13 @@ const generateSystemDomain = async (params: IDomainParams): Promise<{ domain: st
   let sysDomain
   for(let i=0;i<5;i++){
     try{
-      sleep.sleep(5)
+      await setTimeout(function() {
+      }, 5000);
       sysDomain = await domainConponent.get(inputs);
       break
     }catch (e){
-      sleep.sleep(1)
+      await setTimeout(function() {
+      }, 2000);
     }
   }
   Logger.debug(LOGCONTEXT, `Test Domain: ${sysDomain}`);

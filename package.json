@@ -1,6 +1,6 @@
 {
   "name": "jamstack",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "main": "./lib/index.js",
   "dependencies": {
     "@alicloud/alidns20150109": "^1.0.2",
@@ -15,8 +15,7 @@
     "lodash.get": "^4.4.2",
     "path-to-regexp": "^6.2.0",
     "walk-sync": "^2.2.0",
-    "lodash": "*",
-    "sleep": "^6.3.0"
+    "lodash": "*"
   },
   "devDependencies": {
     "@types/ali-oss": "^6.0.7",
